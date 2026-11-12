@@ -21,16 +21,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - name: Collect unverified public SSH host keys without logging in
+      - name: Verify the RSA host key fingerprint against CloudNext support confirmation
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          VERIFIED_RSA_SHA256: 'SHA256:hKxyk+232nxSLX/gRKox2f3tvTvDOHAu/BMcGMG9cNc'
+        shell: bash
         run: |
           set -euo pipefail
-          test -n "$SFTP_HOST"
-          ssh-keyscan -T 15 -p 22 -t ed25519,ecdsa,rsa "$SFTP_HOST" > /tmp/observed_hostkeys
-          test -s /tmp/observed_hostkeys
-          echo 'UNVERIFIED: compare these fingerprints with CloudNext independently before storing known hosts.'
-          ssh-keygen -lf /tmp/observed_hostkeys -E sha256
+          HOST="${SFTP_HOST:-ssh.gb.stackcp.com}"
+          if [[ "$HOST" != "ssh.gb.stackcp.com" ]]; then
+            echo "Unexpected host. CloudNext has verified only ssh.gb.stackcp.com."
+            exit 1
+          fi
+          ssh-keyscan -T 15 -p 22 -t rsa "$HOST" > /tmp/observed_rsa_hostkey
+          test -s /tmp/observed_rsa_hostkey
+          OBSERVED="$(ssh-keygen -lf /tmp/observed_rsa_hostkey -E sha256 | awk '{print $2}')"
+          if [[ "$OBSERVED" != "$VERIFIED_RSA_SHA256" ]]; then
+            echo "STOP: RSA host key does not match CloudNext's confirmed fingerprint."
+            exit 1
+          fi
+          echo "PASS: observed RSA public host key matches the fingerprint confirmed by CloudNext support."
+          echo "Copy the following PUBLIC host-key line to the SFTP_KNOWN_HOSTS secret:"
+          cat /tmp/observed_rsa_hostkey
+          echo "Do not use this check as proof that SFTP authentication or document paths work."
   inspect:
     if: inputs.operation == 'inspect'
     runs-on: ubuntu-latest
