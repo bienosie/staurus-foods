@@ -1,0 +1,73 @@
+name: Staurus Foods approved production release
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_sha:
+        description: Full 40-character commit SHA of the client-approved preview
+        required: true
+        type: string
+      approval_reference:
+        description: Client approver, approval date and reference to the recorded approval
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: cloudnext-deployment
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main' && vars.LIVE_RELEASE_ENABLED == 'true'
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Extract reviewed source using trusted release tooling
+        env:
+          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+        run: |
+          python - <<'PY'
+          import os, re, subprocess, pathlib
+          sha = os.environ['REVIEWED_SHA']
+          if not re.fullmatch(r'[0-9a-f]{40}', sha):
+              raise ValueError('A full commit SHA is required')
+          subprocess.run(['git', 'merge-base', '--is-ancestor', sha, 'HEAD'], check=True)
+          files = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', sha, 'site/']).decode().splitlines()
+          if not files:
+              raise ValueError('Reviewed commit contains no site files')
+          for name in files:
+              target = pathlib.Path('reviewed') / name
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_bytes(subprocess.check_output(['git', 'show', sha + ':' + name]))
+          PY
+      - run: python -m unittest discover -s tests -v
+      - name: Build approved production files
+        env:
+          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+        run: python scripts/build.py --source reviewed/site --output dist/production --sha "$REVIEWED_SHA"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: approved-production-${{ inputs.reviewed_sha }}
+          path: dist/production/
+          retention-days: 90
+      - run: python -m pip install -r requirements-deploy.txt
+      - name: Verify preview, back up live files and release
+        run: python scripts/deploy.py --bundle dist/production --production
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ vars.SFTP_PORT || '22' }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PRIVATE_KEY: ${{ secrets.SFTP_PRIVATE_KEY }}
+          SFTP_KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+          PREVIEW_DIR: ${{ vars.PREVIEW_DIR }}
+          PRODUCTION_DIR: ${{ vars.PRODUCTION_DIR }}
+          BACKUP_DIR: ${{ vars.BACKUP_DIR }}
+          LIVE_RELEASE_ENABLED: ${{ vars.LIVE_RELEASE_ENABLED }}
+          APPROVAL_REFERENCE: ${{ inputs.approval_reference }}
