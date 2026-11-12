@@ -1,0 +1,54 @@
+name: CloudNext SFTP preflight (read-only)
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Discover host fingerprint, or inspect using independently verified pinned key
+        required: true
+        type: choice
+        options: [discover, inspect]
+        default: discover
+      directory:
+        description: Existing directory to inspect (metadata only)
+        required: true
+        default: '.'
+        type: string
+permissions:
+  contents: read
+jobs:
+  discover:
+    if: inputs.operation == 'discover'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Collect unverified public SSH host keys without logging in
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+        run: |
+          set -euo pipefail
+          test -n "$SFTP_HOST"
+          ssh-keyscan -T 15 -p 22 -t ed25519,ecdsa,rsa "$SFTP_HOST" > /tmp/observed_hostkeys
+          test -s /tmp/observed_hostkeys
+          echo 'UNVERIFIED: compare these fingerprints with CloudNext independently before storing known hosts.'
+          ssh-keygen -lf /tmp/observed_hostkeys -E sha256
+  inspect:
+    if: inputs.operation == 'inspect'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-deploy.txt
+      - name: Verify host identity and list remote metadata only
+        run: python scripts/sftp_preflight.py
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: '22'
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+          INSPECT_DIRECTORY: ${{ inputs.directory }}
