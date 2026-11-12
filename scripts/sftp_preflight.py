@@ -25,9 +25,18 @@ def main():
             raise ValueError("Host not independently pinned in known_hosts")
         client.set_missing_host_key_policy(paramiko.RejectPolicy())
         try:
-            client.connect(hostname=host, username=user, password=configured("SFTP_PASSWORD"),
-                port=22, allow_agent=False, look_for_keys=False, timeout=20, auth_timeout=20,
+            options = dict(hostname=host, username=user, port=22,
+                allow_agent=False, look_for_keys=False, timeout=20, auth_timeout=20,
                 banner_timeout=20)
+            private_key = os.environ.get("SFTP_PRIVATE_KEY", "").strip()
+            if private_key:
+                keyfile = Path(temp) / "deploy_key"
+                keyfile.write_text(private_key + "\n")
+                keyfile.chmod(0o600)
+                options["key_filename"] = str(keyfile)
+            else:
+                options["password"] = configured("SFTP_PASSWORD")
+            client.connect(**options)
             with client.open_sftp() as sftp:
                 path = os.environ.get("INSPECT_DIRECTORY", ".")
                 if not path or "\x00" in path or ".." in path.split("/"):
