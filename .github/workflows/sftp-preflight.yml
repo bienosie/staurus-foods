@@ -36,8 +36,11 @@ jobs:
           ssh-keyscan -T 15 -p 22 -t rsa "$HOST" > /tmp/observed_rsa_hostkey
           test -s /tmp/observed_rsa_hostkey
           OBSERVED="$(ssh-keygen -lf /tmp/observed_rsa_hostkey -E sha256 | awk '{print $2}')"
+          echo "Observed RSA host-key fingerprint for the configured endpoint: $OBSERVED"
+          echo "CloudNext support-provided fingerprint: $VERIFIED_RSA_SHA256"
           if [[ "$OBSERVED" != "$VERIFIED_RSA_SHA256" ]]; then
             echo "STOP: RSA host key does not match CloudNext's confirmed fingerprint."
+            echo "Request CloudNext to confirm the fingerprint for the exact configured SSH hostname and port."
             exit 1
           fi
           echo "PASS: observed RSA public host key matches the fingerprint confirmed by CloudNext support."
