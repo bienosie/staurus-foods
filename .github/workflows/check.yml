@@ -1,0 +1,26 @@
+name: Validate Staurus Foods static site
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'site/**'
+      - 'scripts/build.py'
+      - '.github/workflows/check.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/build.py --output dist/preview --sha "$GITHUB_SHA" --preview
+      - uses: actions/upload-artifact@v4
+        with:
+          name: staurus-foods-review-${{ github.sha }}
+          path: dist/preview/
+          retention-days: 30
