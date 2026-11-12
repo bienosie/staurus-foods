@@ -1,0 +1,49 @@
+name: Staurus Foods preview (manual approval)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cloudnext-deployment
+  cancel-in-progress: false
+jobs:
+  preview:
+    if: github.ref == 'refs/heads/main' && vars.PREVIEW_ENABLED == 'true'
+    environment: preview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -v
+      - run: python scripts/build.py --output dist/preview --sha "$GITHUB_SHA" --preview
+      - run: python -m pip install -r requirements-deploy.txt
+      - name: Upload immutable preview
+        run: python scripts/deploy.py --bundle dist/preview
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ vars.SFTP_PORT || '22' }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PRIVATE_KEY: ${{ secrets.SFTP_PRIVATE_KEY }}
+          SFTP_KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+          PREVIEW_DIR: ${{ vars.PREVIEW_DIR }}
+          PRODUCTION_DIR: ${{ vars.PRODUCTION_DIR }}
+          PREVIEW_PROTECTION_VERIFIED: ${{ vars.PREVIEW_PROTECTION_VERIFIED }}
+      - name: Record preview link
+        env:
+          PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
+        run: |
+          python - <<'PY'
+          import os
+          from urllib.parse import urlsplit
+          base = os.environ['PREVIEW_BASE_URL'].rstrip('/')
+          if urlsplit(base).scheme != 'https':
+              raise ValueError('Configure an HTTPS preview base URL')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write('Client preview: ' + base + '/' + os.environ['GITHUB_SHA'] + '/\n')
+              f.write('Record client approval against this full commit SHA before release.\n')
+          PY
