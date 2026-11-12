@@ -35,6 +35,14 @@ def build(source, output, sha, preview=False):
     if not re.fullmatch(r'[0-9a-f]{40}', sha):
         raise ValueError('A full 40-character source commit SHA is required')
     files = validate(source)
+    if not preview:
+        index = (source / 'index.html').read_text().lower()
+        robots = (source / 'robots.txt').read_text().lower()
+        if 'noindex' in index or 'disallow: /' in robots:
+            raise ValueError('Production blocked: remove draft noindex/robots restrictions only after final approval')
+        js = source / 'assets' / 'main.js'
+        if js.exists() and 'REPLACE_WITH_VERIFIED_COMPANY_EMAIL' in js.read_text():
+            raise ValueError('Production blocked: buyer form receiver is not configured')
     if output.exists():
         raise ValueError('Output directory must be new')
     output.mkdir(parents=True)
