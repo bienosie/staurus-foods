@@ -26,12 +26,18 @@ class WebsiteChecks(unittest.TestCase):
                     with self.subTest(page=page, target=local):
                         self.assertTrue((SITE / local).is_file(), f"Missing asset: {local}")
 
-    def test_draft_is_not_accidentally_public_ready(self):
-        # Preview content must remain marked for review until the launch gate is met.
+    def test_public_source_is_indexing_ready(self):
+        # The preview build independently injects noindex and disallows crawling.
         for page in PAGES:
-            self.assertIn("noindex", (SITE / page).read_text().lower())
-        self.assertIn("Disallow: /", (SITE / "robots.txt").read_text())
+            html = (SITE / page).read_text(encoding="utf-8").lower()
+            self.assertNotIn("noindex", html)
+            self.assertNotIn("approval-preview", html)
+            self.assertNotIn("site preview:", html)
+        robots = (SITE / "robots.txt").read_text(encoding="utf-8").lower()
+        self.assertNotIn("disallow: /", robots)
+        self.assertIn("sitemap: https://staurusfoods.com/sitemap.xml", robots)
         self.assertTrue((SITE / "sitemap.xml").is_file())
+        self.assertNotIn("REPLACE_WITH_VERIFIED_COMPANY_EMAIL", (SITE / "assets" / "main.js").read_text())
 
     def test_branding_is_present(self):
         self.assertTrue((SITE / "assets" / "staurus-logo.webp").is_file())
