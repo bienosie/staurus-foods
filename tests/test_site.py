@@ -5,7 +5,8 @@ from pathlib import Path
 
 SITE = Path(__file__).resolve().parents[1] / "site"
 PAGES = ("index.html", "commodities.html", "about.html", "quality.html",
-         "enquire.html", "trade-fairs.html", "privacy.html", "terms.html")
+         "enquire.html", "trade-fairs.html", "privacy.html", "terms.html",
+         "raw-cashew-nuts.html", "cocoa-beans.html", "sesame-seeds.html", "soya-beans.html")
 
 class WebsiteChecks(unittest.TestCase):
     def test_all_pages_present(self):
@@ -30,6 +31,7 @@ class WebsiteChecks(unittest.TestCase):
         for page in PAGES:
             self.assertIn("noindex", (SITE / page).read_text().lower())
         self.assertIn("Disallow: /", (SITE / "robots.txt").read_text())
+        self.assertTrue((SITE / "sitemap.xml").is_file())
 
     def test_branding_is_present(self):
         self.assertTrue((SITE / "assets" / "staurus-logo.webp").is_file())
