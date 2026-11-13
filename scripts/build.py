@@ -36,10 +36,20 @@ def build(source, output, sha, preview=False):
         raise ValueError('A full 40-character source commit SHA is required')
     files = validate(source)
     if not preview:
-        index = (source / 'index.html').read_text().lower()
-        robots = (source / 'robots.txt').read_text().lower()
-        if 'noindex' in index or 'disallow: /' in robots:
-            raise ValueError('Production blocked: remove draft noindex/robots restrictions only after final approval')
+        pages = sorted(source.glob('*.html'))
+        if not pages:
+            raise ValueError('Production blocked: missing HTML pages')
+        for page in pages:
+            html = page.read_text(encoding='utf-8').lower()
+            if 'noindex' in html or 'approval-preview' in html or 'site preview:' in html:
+                raise ValueError(f'Production blocked: draft controls or wording in {page.name}')
+            if 'replace_with_verified_company_email' in html:
+                raise ValueError(f'Production blocked: unconfigured email in {page.name}')
+        robots = (source / 'robots.txt').read_text(encoding='utf-8').lower()
+        if 'disallow: /' in robots:
+            raise ValueError('Production blocked: robots.txt disallows public crawling')
+        if 'sitemap: https://staurusfoods.com/sitemap.xml' not in robots:
+            raise ValueError('Production blocked: canonical sitemap reference missing')
         js = source / 'assets' / 'main.js'
         if js.exists() and 'REPLACE_WITH_VERIFIED_COMPANY_EMAIL' in js.read_text():
             raise ValueError('Production blocked: buyer form receiver is not configured')
