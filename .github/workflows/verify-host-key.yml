@@ -1,6 +1,9 @@
 name: Verify CloudNext RSA host identity
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/verify-host-key.yml'
 permissions:
   contents: read
 jobs:
