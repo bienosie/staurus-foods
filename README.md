@@ -59,3 +59,13 @@ Repository variables reported configured:
 7. Keep production disabled until a reviewed release, completed backup and approval.
 
 **Do not deploy the production website or enable either switch merely because CloudNext supplied the fingerprint.**
+
+## CloudNext host identity, confirmed 13 November 2026
+
+CloudNext support replied for `ssh.gb.stackcp.com:22` and confirmed the **RSA** SSH host-key fingerprint:
+
+`SHA256:KlbVjzb5BI2vyBtX3kK0ZDSCdHAQLWZpIC15HD+26xU`
+
+This is a fingerprint, **not** the `known_hosts` key line. Retrieve the full RSA public host-key record using `ssh-keyscan -p 22 -t rsa ssh.gb.stackcp.com`; verify the SHA256 fingerprint of that exact key against the support value **before** entering the full public key line in the GitHub `SFTP_KNOWN_HOSTS` secret. Do not substitute an ED25519/ECDSA key without independent verification. Never disable host-key verification.
+
+CloudNext has **not** yet confirmed the SFTP document root, directory permissions, authentication, or POSIX rename support in that email. Production and preview release switches remain disabled pending a verified connection and successful client preview.
