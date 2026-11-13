@@ -15,7 +15,7 @@ def validate(source):
     files = sorted(p for p in source.rglob('*') if p.is_file())
     if any(p.is_symlink() for p in source.rglob('*')):
         raise ValueError('Symlinks are not permitted in the site bundle')
-    for page in ('index.html', 'commodities.html', 'enquire.html', 'about.html'):
+    for page in ('index.html', 'commodities.html', 'enquire.html', 'about.html', 'raw-cashew-nuts.html', 'cocoa-beans.html', 'sesame-seeds.html', 'soya-beans.html'):
         text = (source / page).read_text()
         for name in re.findall(r"(?:href|src)=[\"']([^\"']+)[\"']", text):
             if name.startswith(('#', 'https:', 'http:', 'mailto:', 'data:', '${')):
@@ -24,7 +24,7 @@ def validate(source):
             if target and not (source / target).is_file():
                 raise ValueError(f'{page}: missing local asset {target}')
     for path in files:
-        if path.suffix not in {'.html', '.css', '.js', '.pdf', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.txt'}:
+        if path.suffix not in {'.html', '.css', '.js', '.pdf', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.txt', '.xml'}:
             raise ValueError(f'Unexpected deployable file: {path}')
         if path.suffix == '.pdf' and not path.read_bytes().startswith(b'%PDF-'):
             raise ValueError(f'Invalid PDF: {path.name}')
