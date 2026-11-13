@@ -24,7 +24,7 @@ jobs:
       - name: Verify the RSA host key fingerprint against CloudNext support confirmation
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          VERIFIED_RSA_SHA256: 'SHA256:hKxyk+232nxSLX/gRKox2f3tvTvDOHAu/BMcGMG9cNc'
+          VERIFIED_RSA_SHA256: 'SHA256:KlbVjzb5BI2vyBtX3kK0ZDSCdHAQLWZpIC15HD+26xU'
         shell: bash
         run: |
           set -euo pipefail
