@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /
+# Remove this restriction only after approved production publication.
