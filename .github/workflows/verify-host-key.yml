@@ -1,0 +1,35 @@
+name: Verify CloudNext RSA host identity
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Fetch and verify RSA host key independently confirmed by CloudNext
+        shell: bash
+        env:
+          HOST: ssh.gb.stackcp.com
+          EXPECTED: SHA256:KlbVjzb5BI2vyBtX3kK0ZDSCdHAQLWZpIC15HD+26xU
+        run: |
+          set -euo pipefail
+          ssh-keyscan -T 15 -p 22 -t rsa "$HOST" > "$RUNNER_TEMP/cloudnext-rsa-hostkey"
+          test -s "$RUNNER_TEMP/cloudnext-rsa-hostkey"
+          ssh-keygen -lf "$RUNNER_TEMP/cloudnext-rsa-hostkey" -E sha256 > "$RUNNER_TEMP/fingerprint.txt"
+          echo 'Comparing fingerprint with independently confirmed CloudNext support response.'
+          cat "$RUNNER_TEMP/fingerprint.txt"
+          if ! grep -Fq "$EXPECTED" "$RUNNER_TEMP/fingerprint.txt"; then
+            echo 'MISMATCH: do not trust or save this key; contact CloudNext.'
+            exit 1
+          fi
+          echo 'MATCH: RSA host fingerprint verified against support response.'
+          {
+            echo '### Verified CloudNext RSA host key'
+            echo 'SHA256 fingerprint matches CloudNext support confirmation dated 13 November 2026.'
+            echo 'Copy the entire line below as the `SFTP_KNOWN_HOSTS` GitHub secret.'
+            echo '\`\`\`'
+            cat "$RUNNER_TEMP/cloudnext-rsa-hostkey"
+            echo '\`\`\`'
+          } >> "$GITHUB_STEP_SUMMARY"
