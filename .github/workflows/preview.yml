@@ -1,6 +1,11 @@
 name: Staurus Foods preview (manual approval)
 on:
   workflow_dispatch:
+  push:
+    branches: ['main']
+    paths:
+      - 'site/**'
+      - '.github/workflows/preview.yml'
 permissions:
   contents: read
 concurrency:
