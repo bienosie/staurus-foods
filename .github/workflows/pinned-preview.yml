@@ -180,7 +180,7 @@ jobs:
                   # Send Basic auth pre-emptively only to the protected preview origin.
                   # Never attach the header to external fonts or other hosts.
                   token = base64.b64encode((os.environ['PREVIEW_HTTP_USER'] + ':' + os.environ['PREVIEW_HTTP_PASSWORD']).encode()).decode()
-                  context.route(re.compile(r'^https://preview\\.staurusfoods\\.com/'),
+                  context.route('https://preview.staurusfoods.com/**',
                       lambda route: route.continue_(headers={**route.request.headers,'Authorization':'Basic ' + token}))
                   page = context.new_page()
                   for name in ['index.html','commodities.html','hibiscus-flowers.html','insights.html']:
