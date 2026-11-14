@@ -165,7 +165,7 @@ jobs:
           PREVIEW_HTTP_PASSWORD: ${{ secrets.PREVIEW_HTTP_PASSWORD }}
         run: |
           python - <<'PY'
-          import json, os, pathlib
+          import base64, json, os, pathlib, re
           from playwright.sync_api import sync_playwright
           sha = os.environ['REVIEWED_SHA']
           base = 'https://preview.staurusfoods.com/' + sha + '/'
@@ -177,10 +177,15 @@ jobs:
               for label, viewport in [('desktop',{'width':1440,'height':1000}),('mobile',{'width':390,'height':844})]:
                   context = browser.new_context(viewport=viewport, http_credentials={
                       'username':os.environ['PREVIEW_HTTP_USER'],'password':os.environ['PREVIEW_HTTP_PASSWORD']})
+                  # Send Basic auth pre-emptively only to the protected preview origin.
+                  # Never attach the header to external fonts or other hosts.
+                  token = base64.b64encode((os.environ['PREVIEW_HTTP_USER'] + ':' + os.environ['PREVIEW_HTTP_PASSWORD']).encode()).decode()
+                  context.route(re.compile(r'^https://preview\\.staurusfoods\\.com/'),
+                      lambda route: route.continue_(headers={**route.request.headers,'Authorization':'Basic ' + token}))
                   page = context.new_page()
                   for name in ['index.html','commodities.html','hibiscus-flowers.html','insights.html']:
                       response = page.goto(base + name, wait_until='networkidle')
-                      assert response.status == 200, name
+                      assert response.status == 200, name + ': HTTP ' + str(response.status)
                       page.locator('img[src="assets/hibiscus-product.webp"]').scroll_into_view_if_needed()
                       page.wait_for_function('Array.from(document.images).every(i=>i.complete && i.naturalWidth>0)')
                       page.evaluate('document.fonts.ready')
