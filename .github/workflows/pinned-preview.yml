@@ -186,6 +186,8 @@ jobs:
                   for name in ['index.html','commodities.html','hibiscus-flowers.html','insights.html']:
                       response = page.goto(base + name, wait_until='networkidle')
                       assert response.status == 200, name + ': HTTP ' + str(response.status)
+                      for picture in page.locator('img').all():
+                          picture.scroll_into_view_if_needed()
                       page.locator('img[src="assets/hibiscus-product.webp"]').scroll_into_view_if_needed()
                       page.wait_for_function('Array.from(document.images).every(i=>i.complete && i.naturalWidth>0)')
                       page.evaluate('document.fonts.ready')
@@ -206,6 +208,7 @@ jobs:
           print('PASS: eight desktop/mobile image and layout checks; screenshots ready for visual review.')
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: hibiscus-visual-review-${{ inputs.source_sha }}
           path: screenshots/
