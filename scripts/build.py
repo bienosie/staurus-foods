@@ -15,7 +15,7 @@ def validate(source):
     files = sorted(p for p in source.rglob('*') if p.is_file() and p.name != 'README.md')
     if any(p.is_symlink() for p in source.rglob('*')):
         raise ValueError('Symlinks are not permitted in the site bundle')
-    for page in ('index.html', 'commodities.html', 'enquire.html', 'about.html', 'quality.html', 'trade-fairs.html', 'privacy.html', 'terms.html', 'raw-cashew-nuts.html', 'cocoa-beans.html', 'sesame-seeds.html', 'soya-beans.html'):
+    for page in ('index.html', 'commodities.html', 'enquire.html', 'about.html', 'quality.html', 'trade-fairs.html', 'privacy.html', 'terms.html', 'raw-cashew-nuts.html', 'cocoa-beans.html', 'sesame-seeds.html', 'soya-beans.html', 'hibiscus-flowers.html'):
         text = (source / page).read_text()
         for name in re.findall(r"(?:href|src)=[\"']([^\"']+)[\"']", text):
             if name.startswith(('#', 'https:', 'http:', 'mailto:', 'data:', '${')):
