@@ -41,7 +41,7 @@ $values = [];
 foreach ($keys as $key) {
     $v = trim((string)($_POST[$key] ?? ''));
     $v = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $v) ?? '';
-    if (mb_strlen($v, 'UTF-8') > ($key === 'requirements' ? 3000 : 250)) {
+    if (strlen($v) > ($key === 'requirements' ? 6000 : 500)) {
         reply(400, 'A field exceeds its permitted length.');
     }
     $values[$key] = $v;
