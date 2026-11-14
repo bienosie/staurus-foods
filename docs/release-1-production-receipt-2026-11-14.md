@@ -81,7 +81,9 @@ Google Search Console was accessible in the existing account, but staurusfoods.c
 
 At launch, DNS verification was pending. In the subsequent commissioning session on 14 November 2026, the owner signed into CloudNext and the Google TXT record above was added to the apex through StackCP. A before/after comparison confirmed all twelve existing DNS records, including MX and SPF, were unchanged; there are now thirteen records. Google confirmed Ownership verified using the Domain name provider method. The TXT record must remain in place. The sitemap was submitted, processed successfully, and Google reported twelve discovered pages. The live homepage test confirmed URL is available to Google and Page can be indexed. The index inspection still showed historical pre-launch redirect data. Cashew and cocoa inspections showed Discovered - currently not indexed; sesame and soya showed URL is unknown to Google in their inspection snapshots. No indexing claim is made and no manual indexing request was sent.
 
-Bing Webmaster Tools reached its sign-in/account chooser. Verification/import and sitemap submission remain pending sign-in. IndexNow was assessed as not yet configured; no key file, API key or paid service was introduced.
+Bing commissioning completed in the subsequent session on 14 November 2026. Signed in using the same Google account as Search Console. Direct CNAME verification was used, without granting a new Google Search Console data-import permission. Added `1670ecb6a5c6935ee72d7084c3052c45.staurusfoods.com` CNAME to `verify.bing.com.`. StackCP confirmed save, and all thirteen pre-existing records were preserved (fourteen records after this addition). The site became accessible in Bing Webmaster Tools following verification. Submitted `https://staurusfoods.com/sitemap.xml`; Bing lists one sitemap, status Processing, zero reported errors/warnings and zero URLs discovered at the receipt time. This is submission confirmation, not evidence of completed processing or indexing. Bing AI Performance showed zero citations and zero average cited pages, with its displayed data ending 13 November 2026 before this launch. IndexNow is not configured; it was assessed as a useful future addition to the controlled publication workflow. No key file, API key or paid service was introduced.
+
+A request using the official OAI-SearchBot user-agent string returned 200 for robots.txt, the homepage and raw cashew page, with no X-Robots-Tag restrictions. This tests that request path and user-agent handling only; it does not establish access from all published OpenAI crawler IPs or guarantee ChatGPT inclusion.
 
 ## F. Safety and follow-up
 
@@ -91,5 +93,17 @@ Outstanding items do not prevent the verified public site being live:
 
 1. Diagnose normal Edge preview HTTP-auth prompt behaviour later.
 2. Google domain verification, sitemap submission and homepage/commodity URL inspection completed. Keep the verification TXT record. Monitor indexing after Google's next crawls.
-3. Secure Bing sign-in, verify/import the site and submit sitemap; then decide whether IndexNow is useful.
+3. Bing verification and sitemap submission completed. Monitor processing and indexing. Consider IndexNow notifications for future approved releases.
 4. Owner-assisted native mail-client and inbox delivery test.
+
+## AI search recommendations following commissioning
+
+Recommended next work, not deployed changes:
+
+1. Expand each commodity page with buyer-useful specification tables using only verified partner data; distinguish requested specifications from available lot evidence and avoid invented grades, capacities, MOQ or certifications.
+2. Add concise buyer questions and answers about samples, independent inspection, ordering steps, payment clearance and contractual shipment terms. Publish only terms actually approved by the owner and sourcing partner.
+3. Strengthen consistent company identity and visible evidence: verified contact information, registration reference, official profiles, relevant product/lot documentation where publishable, and accurate Organization structured data matching visible text.
+4. Add free IndexNow notifications to the existing approved deployment process when undertaking a source-tested release. Do not replace sitemap submission or bypass preview/backup controls.
+5. Measure search discovery, qualified buyer enquiries and Bing AI citations. No recurring automation was created by this commissioning.
+
+Evidence used: Bing Webmaster Guidelines (https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a), Google AI features guidance (https://developers.google.com/search/docs/appearance/ai-features), OpenAI crawler documentation (https://developers.openai.com/api/docs/bots), and Bing AI Performance documentation (https://www.bing.com/webmasters/help/ai-performance-9f8e7d6c). Search indexing, AI citations and recommendations are not guaranteed. Special AI text files or paid SEO subscriptions are not prerequisites for Google AI search eligibility.
