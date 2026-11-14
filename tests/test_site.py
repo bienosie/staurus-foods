@@ -7,7 +7,8 @@ SITE = Path(__file__).resolve().parents[1] / "site"
 PAGES = ("index.html", "commodities.html", "about.html", "quality.html",
          "enquire.html", "trade-fairs.html", "privacy.html", "terms.html",
          "raw-cashew-nuts.html", "cocoa-beans.html", "sesame-seeds.html", "soya-beans.html",
-         "hibiscus-flowers.html")
+         "hibiscus-flowers.html", "insights.html",
+         "insights-hibiscus-buyers.html", "insights-trial-order.html")
 
 class WebsiteChecks(unittest.TestCase):
     def test_all_pages_present(self):
