@@ -1,40 +1,81 @@
-# Hibiscus Release 1 addendum status
+# Hibiscus Release 1 deployment receipt
 
-14 November 2026, Europe/London.
+14 November 2026, GMT. Production deployed successfully; final public asset-cache correction awaits CloudNext sign-in.
 
-## Exact release scope
+## A. Preview recovery
 
-Owner-requested source SHA: `6e9ad0531f9388edf209194ab8a8caf742990d75`.
+- Original HTTP 500 root cause: AuthUserFile referenced a missing `.htpasswd` file. CloudNext log at 07:51:24 GMT recorded `AH01620: Could not open password file: /home/sites/10b/f/ffe8ba666a/private-auth/.htpasswd`.
+- The actual existing password file was `.htpasswd.txt`. Corrected that reference; retained the existing password entry, Basic authentication, Require valid-user, Options -Indexes and preview noindex headers. No credentials were disclosed.
+- Exact reviewed preview: https://preview.staurusfoods.com/6e9ad0531f9388edf209194ab8a8caf742990d75/
+- Reviewed and published source SHA: `6e9ad0531f9388edf209194ab8a8caf742990d75`.
+- Authenticated verification succeeded in https://github.com/bienosie/staurus-foods/actions/runs/43588925119 , attempt 2, job 132429681522.
+- Anonymous and deliberately incorrect credentials returned 401. Correct credentials returned 200 for the manifest and all 26 files, including all 13 HTML pages. Manifest equality, SHA-256 hashes, local links, noindex controls, disabled preview forms, disabled directory listing and private-path protection passed.
+- Log at 11:15:31 GMT: PASS authenticated HTTP checks, immutable file hashes, internal links, anonymous/incorrect credential rejection, noindex, disabled preview forms and private path protection.
+- Attempt 1 of that run suffered an SFTP read connection drop before HTTP verification; retry verified the identical immutable preview. Earlier run 43584117516 uploaded the preview but lacked the HTTP password secret. These are superseded by the successful verification above.
+- Normal Edge's missing password prompt remains a browser-session issue. Server authentication is now independently verified.
 
-This revision contains thirteen HTML pages and thirteen unique canonical sitemap entries, including hibiscus-flowers.html. Later main commits add Insights and Africa-wide source changes; those are outside this explicitly pinned thirteen-page operation and have not been substituted for the reviewed source.
+## B. GitHub
 
-Hibiscus is retained in homepage priority products, catalogue and buyer form. The hibiscus page's title, description, canonical and JSON-LD WebPage URL match the intended production URL. Local links and assets resolve. The illustration is explicitly labelled as an illustration, not stock photography or evidence of inventory. Copy does not assert available stock, certified grades or laboratory results. The enquiry JavaScript supports hibiscus preselection.
+- All four pinned-source tests passed locally and in GitHub. Production extraction uses the reviewed source's matching tests and builder.
+- The approved scope is exactly 13 HTML pages, including hibiscus. Later main changes involving Insights and Africa-wide copy were not substituted into this pinned operation.
+- Workflow head at dispatch: `c7c7b6ed52d9badea01a1e7ed4a3498201dead68`. Site source is the pinned SHA above; this documentation commit does not change published content.
+- Production workflow: https://github.com/bienosie/staurus-foods/actions/runs/43589696603 , job 132431599083, SUCCESS.
+- Owner reference: Stephen's 13 November 2026 production authorisation plus the authorised hibiscus Release 1 addendum on 14 November 2026 in the Staurus Foods conversation; preview verification run and attempt were recorded in the input.
+- The prior candidate 89a60834c0e8dc2261e6cd85343ffd8f36c22b4c was not redeployed for this addendum.
 
-## Verification completed
+## C. CloudNext
 
-- All four local repository tests passed against the pinned revision.
-- Local preview and production builds each contain twenty-six source files.
-- The sitemap has exactly thirteen unique URLs matching the thirteen HTML pages.
-- A local rehearsal of the revised approved-release extraction, reviewed tests and reviewed builder passed and produced the identical production manifest.
-- GitHub pinned preview run: https://github.com/bienosie/staurus-foods/actions/runs/43584117516 .
-- GitHub job `132414980659`: reviewed ancestor pin, four tests, preview build and immutable preview upload/checksum verification all passed.
-- GitHub log at 10:14:16 GMT: `Preview uploaded and verified: 6e9ad0531f9388edf209194ab8a8caf742990d75`.
-- Protected preview URL: https://preview.staurusfoods.com/6e9ad0531f9388edf209194ab8a8caf742990d75/ .
-- Anonymous request returned 401 with Basic realm `Staurus Foods Release 1 Preview` and X-Robots-Tag noindex/nofollow/noarchive.
-- Deliberately invalid diagnostic credentials returned 401.
+Hosting remains CloudNext/20i Linux, account WEB363598.
 
-## Precise remaining blocker
+| Purpose | Verified directory |
+| --- | --- |
+| Production | /home/sites/10b/f/ffe8ba666a/public_html |
+| Preview | /home/sites/10b/f/ffe8ba666a/preview-site |
+| Authentication | /home/sites/10b/f/ffe8ba666a/private-auth |
+| Private backups | /home/sites/10b/f/ffe8ba666a/private-backups |
 
-The overall pinned preview workflow is not green. Its last authenticated HTTP verification step stopped because preview HTTP credentials are not configured in GitHub. It did not report a site-content or upload failure. No authenticated thirteen-page HTTP success is claimed.
+The deployment enforces separate real production, preview and backup directories, rejects symlinks, checks remote preview parity and uses pinned SSH known-host verification.
 
-The latest pinned-preview workflow defaults to the established username `staurus-preview` and needs one repository secret: `PREVIEW_HTTP_PASSWORD`. The owner must enter the existing preview password securely in GitHub, not chat. An optional `PREVIEW_HTTP_USER` secret can override the default if the username changes. After entry, dispatch a new pinned preview run on current main with the same source_sha, rather than rerunning the older workflow definition that still required both secrets.
+Verified pre-release backup:
+`/home/sites/10b/f/ffe8ba666a/private-backups/20261114T112307434875Z-6e9ad0531f9388edf209194ab8a8caf742990d75`
 
-The HTTP check is read-only. It rejects redirects, restricts credential-bearing requests to preview.staurusfoods.com, validates exact manifest/file hashes and source SHA, checks all HTML/internal links and assets, verifies noindex and disabled preview forms, and checks anonymous/invalid credential rejection and private-path protection. It does not remove or change Basic authentication.
+Receipt: the directory above plus `/deployment-receipt.json`. It records reviewed source, owner approval reference, actor, run ID and previous-file hashes. The script copies and checksum-verifies all affected existing files before production replacement.
 
-The approved production workflow now extracts the reviewed site's matching tests and builder, so later main requirements do not get mixed into a pinned release. Deployment still uses the current controlled SFTP deployment script with pinned host verification, remote preview source/checksum parity, verified private backup and production file verification.
+Log at 11:26:50 GMT confirms Verified pre-release backup created and Production files verified.
 
-## Production state and next actions
+SFTP port 22 retained host verification. Independently verified RSA identity:
+`SHA256:KlbVjzb5BI2vyBtX3kK0ZDSCdHAQLWZpIC15HD+26xU`.
+The production run retained Paramiko RejectPolicy and existing known-host pin.
 
-LIVE_RELEASE_ENABLED was confirmed false before work and has not been enabled during this addendum. The existing live release remains unchanged; hibiscus has not yet been published by this operation. The prior source SHA 89a60834c0e8dc2261e6cd85343ffd8f36c22b4c will not be used for this addendum.
+## D. Public website
 
-After secure credential entry: run authenticated preview verification to green, review the exact pinned preview, open the controlled production window, run the existing approved-release workflow with the pinned source and owner addendum approval reference, verify a fresh private backup and all thirteen live pages/assets/checksums, restore LIVE_RELEASE_ENABLED=false and resubmit the thirteen-page sitemap in Google and Bing. No certification, inventory or export-grade claims may be added without evidence.
+- Homepage HTTPS: 200. Live release.json: 200, source SHA matches reviewed hibiscus release, 26 files.
+- All 13 HTML pages return 200 and exactly match production SHA-256 hashes: homepage, catalogue, hibiscus, raw cashew, cocoa, sesame, soya, about, quality, enquiry, trade fairs, privacy and terms.
+- 24 of 26 public bundle file URLs match expected SHA-256 hashes. Both remaining mismatches are older StackCDN cache entries: assets/main.js and assets/style.css, HTTP 200, X-Origin-Cache-Status HIT and X-CDN-Cache-Status HIT, with pre-release Last-Modified times around 08:27 GMT.
+- Diagnostic requests for those two asset URLs with the reviewed SHA as a query parameter return 200, CDN MISS and exact expected current hashes. Origin uploads are correct; ordinary unversioned URLs require a CloudNext cache purge.
+- Corporate logo, commodity photographs and labelled hibiscus botanical illustration load. Hibiscus illustration is not represented as stock photography or evidence of available inventory.
+- Desktop hibiscus layout rendered correctly with loaded images. At 390 by 844, the mobile page had no horizontal overflow, readable content and a working navigation menu. The temporary viewport override was reset.
+- Hibiscus CTA opens enquire.html?commodity=hibiscus. The new option is present. Automatic preselection is currently affected by the stale main.js cache; manual selection remains available.
+- The exact reviewed JavaScript prepares mailto enquiries to info@staurusfoods.com. It does not send from the server. Native email-client opening and inbox receipt remain owner-assisted checks, not claimed complete.
+- No unverified inventory, laboratory certification or export-grade claims were added.
+
+## E. SEO
+
+- XML sitemap: 200, valid XML, exactly 13 unique canonical URLs including hibiscus.
+- robots.txt: 200, User-agent *, Allow /, sitemap advertised at https://staurusfoods.com/sitemap.xml.
+- All 13 page canonicals use https://staurusfoods.com; production HTML has no draft noindex controls.
+- Google domain property remains verified. Updated sitemap resubmission succeeded and Google reports Success, 13 discovered pages.
+- Google hibiscus URL inspection: Discovered - currently not indexed. Live test at 11:32 GMT: URL is available to Google; Page can be indexed. No indexing or ranking guarantee is implied.
+- Bing site remains verified. Re-submitted the existing sitemap; processing subsequently completed with Success, 13 URLs discovered and zero sitemap errors/warnings.
+- robots rules allow Googlebot, bingbot and OAI-SearchBot. Request tests establish ordinary public access, not access from every crawler IP or guaranteed AI citations.
+- IndexNow remains unconfigured. Recommended future addition through a separately reviewed release; no paid SEO service or new credential was introduced.
+
+## F. Safety and precise remaining work
+
+LIVE_RELEASE_ENABLED was restored to false after successful production deployment and read back from GitHub repository variables. Preview protection remains enabled. Email, MX and DNS were not changed during this addendum. Existing Google TXT and Bing CNAME verification records remain as previously commissioned.
+
+The production release has succeeded and all 13 HTML pages are live. Final complete public-file integrity is not yet claimed because StackCDN still serves the old unversioned JavaScript and CSS.
+
+CloudNext is signed out. Owner must securely sign in at https://control.cloudnext.uk/ . Then purge the staurusfoods.com hosting/CDN cache, recheck both normal asset URL hashes, verify hibiscus preselection and complete the enquiry preparation check. No further production upload is needed for this cache correction.
+
+Further follow-up: native email application/inbox delivery test with owner; search indexing and AI citation monitoring; normal Edge preview prompt behaviour. No hosting move, upgrade, purchases, unrelated DNS changes or CRM development occurred.
