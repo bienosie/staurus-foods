@@ -38,7 +38,7 @@ jobs:
           if not re.fullmatch(r'[0-9a-f]{40}', sha):
               raise ValueError('A full commit SHA is required')
           subprocess.run(['git', 'merge-base', '--is-ancestor', sha, 'HEAD'], check=True)
-          files = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', sha, 'site/']).decode().splitlines()
+          files = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', sha, 'site/', 'tests/', 'scripts/build.py']).decode().splitlines()
           if not files:
               raise ValueError('Reviewed commit contains no site files')
           for name in files:
@@ -46,11 +46,13 @@ jobs:
               target.parent.mkdir(parents=True, exist_ok=True)
               target.write_bytes(subprocess.check_output(['git', 'show', sha + ':' + name]))
           PY
-      - run: python -m unittest discover -s tests -v
+      - name: Validate the reviewed source and its matching tests
+        working-directory: reviewed
+        run: python -m unittest discover -s tests -v
       - name: Build approved production files
         env:
           REVIEWED_SHA: ${{ inputs.reviewed_sha }}
-        run: python scripts/build.py --source reviewed/site --output dist/production --sha "$REVIEWED_SHA"
+        run: python reviewed/scripts/build.py --source reviewed/site --output dist/production --sha "$REVIEWED_SHA"
       - uses: actions/upload-artifact@v4
         with:
           name: approved-production-${{ inputs.reviewed_sha }}
