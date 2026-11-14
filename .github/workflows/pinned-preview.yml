@@ -1,0 +1,144 @@
+name: Staurus Foods pinned preview verification
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Full reviewed 40-character source commit SHA
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: cloudnext-deployment
+  cancel-in-progress: false
+jobs:
+  preview:
+    if: github.ref == 'refs/heads/main' && vars.PREVIEW_ENABLED == 'true'
+    environment: preview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Pin the reviewed ancestor commit
+        env:
+          REVIEWED_SHA: ${{ inputs.source_sha }}
+        run: |
+          python - <<'PY'
+          import os, re, subprocess
+          sha = os.environ['REVIEWED_SHA']
+          if not re.fullmatch(r'[0-9a-f]{40}', sha):
+              raise ValueError('A full commit SHA is required')
+          subprocess.run(['git', 'merge-base', '--is-ancestor', sha, 'HEAD'], check=True)
+          subprocess.run(['git', 'checkout', '--detach', sha], check=True)
+          PY
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate the pinned source
+        run: python -m unittest discover -s tests -v
+      - name: Build pinned preview
+        env:
+          REVIEWED_SHA: ${{ inputs.source_sha }}
+        run: python scripts/build.py --output dist/preview --sha "$REVIEWED_SHA" --preview
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pinned-preview-${{ inputs.source_sha }}
+          path: dist/preview/
+          retention-days: 90
+      - run: python -m pip install -r requirements-deploy.txt
+      - name: Upload and checksum-verify immutable preview
+        run: python scripts/deploy.py --bundle dist/preview
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ vars.SFTP_PORT || '22' }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PRIVATE_KEY: ${{ secrets.SFTP_PRIVATE_KEY }}
+          SFTP_KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+          PREVIEW_DIR: ${{ vars.PREVIEW_DIR }}
+          PRODUCTION_DIR: ${{ vars.PRODUCTION_DIR }}
+          PREVIEW_PROTECTION_VERIFIED: ${{ vars.PREVIEW_PROTECTION_VERIFIED }}
+      - name: Verify authenticated HTTP pages, assets and protection
+        env:
+          REVIEWED_SHA: ${{ inputs.source_sha }}
+          PREVIEW_HTTP_USER: ${{ secrets.PREVIEW_HTTP_USER }}
+          PREVIEW_HTTP_PASSWORD: ${{ secrets.PREVIEW_HTTP_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import base64, hashlib, json, os, pathlib, urllib.request, urllib.error
+          from html.parser import HTMLParser
+          from urllib.parse import urlsplit
+          sha = os.environ['REVIEWED_SHA']
+          root = 'https://preview.staurusfoods.com/'
+          base = root + sha + '/'
+          user = os.environ.get('PREVIEW_HTTP_USER', '')
+          password = os.environ.get('PREVIEW_HTTP_PASSWORD', '')
+          if not user or not password:
+              raise SystemExit('Preview uploaded. Secure authentication required: configure PREVIEW_HTTP_USER and PREVIEW_HTTP_PASSWORD repository secrets, then rerun this workflow. Production must remain disabled.')
+          token = base64.b64encode((user + ':' + password).encode()).decode()
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, *args, **kwargs):
+                  return None
+          opener = urllib.request.build_opener(NoRedirect)
+          def get(url, auth=None):
+              if urlsplit(url).scheme != 'https' or urlsplit(url).hostname not in {'preview.staurusfoods.com', 'staurusfoods.com'}:
+                  raise ValueError('Unexpected HTTP target')
+              headers = {'User-Agent': 'StaurusFoods-Preview-Verification/1.0', 'Cache-Control': 'no-cache'}
+              if auth:
+                  if urlsplit(url).hostname != 'preview.staurusfoods.com':
+                      raise ValueError('Preview credentials cannot be sent to another host')
+                  headers['Authorization'] = 'Basic ' + auth
+              try:
+                  with opener.open(urllib.request.Request(url, headers=headers), timeout=30) as response:
+                      return response.status, response.headers, response.read()
+              except urllib.error.HTTPError as error:
+                  return error.code, error.headers, b''
+          status, headers, _ = get(base)
+          assert status == 401 and headers.get('WWW-Authenticate', '').startswith('Basic'), 'Anonymous access must require Basic authentication'
+          invalid = base64.b64encode(b'diagnostic-invalid:diagnostic-invalid').decode()
+          assert get(base, invalid)[0] == 401, 'Incorrect credentials must be rejected'
+          expected = json.loads(pathlib.Path('dist/preview/release.json').read_text())
+          status, _, data = get(base + 'release.json', token)
+          assert status == 200, 'Authenticated manifest access failed'
+          assert json.loads(data) == expected, 'HTTP preview manifest differs from the reviewed bundle'
+          pages = 0
+          class Page(HTMLParser):
+              def __init__(self):
+                  super().__init__(); self.robots = []; self.links = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if tag == 'meta' and attrs.get('name', '').lower() == 'robots':
+                      self.robots.append(attrs.get('content', '').lower())
+                  if tag in {'a', 'link', 'img', 'script'}:
+                      self.links.append(attrs.get('href') or attrs.get('src') or '')
+          for rel, checksum in expected['files'].items():
+              path = pathlib.PurePosixPath(rel)
+              assert not path.is_absolute() and '..' not in path.parts and not urlsplit(rel).scheme
+              status, headers, data = get(base + rel, token)
+              assert status == 200, 'Authenticated preview file failed: ' + rel
+              assert hashlib.sha256(data).hexdigest() == checksum, 'HTTP checksum mismatch: ' + rel
+              assert 'noindex' in headers.get('X-Robots-Tag', '').lower(), 'Preview header missing: ' + rel
+              if rel.endswith('.html'):
+                  pages += 1
+                  parser = Page(); parser.feed(data.decode())
+                  assert any('noindex' in rule for rule in parser.robots), 'HTML noindex missing: ' + rel
+                  text = data.decode()
+                  assert "form-action 'none'" in text and 'e.stopImmediatePropagation()' in text, 'Preview form controls missing: ' + rel
+                  for link in parser.links:
+                      parsed = urlsplit(link)
+                      if parsed.scheme or parsed.netloc or not parsed.path:
+                          continue
+                      assert parsed.path in expected['files'], 'Broken local preview link in ' + rel
+          assert get(root, token)[0] == 403, 'Preview directory listing must remain disabled'
+          for path in ['private-auth/.htpasswd.txt', 'private-backups/']:
+              assert get('https://staurusfoods.com/' + path)[0] in {403, 404}, 'Private directory exposed'
+          print('PASS: authenticated HTTP checks, immutable file hashes, internal links, anonymous/incorrect credential rejection, noindex, disabled preview forms and private path protection.')
+          print('Reviewed preview SHA: ' + sha)
+          print('Verified HTML pages: ' + str(pages))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('Protected preview verified: ' + base + '\\n')
+              summary.write('HTML pages: ' + str(pages) + '\\n')
+              summary.write('Anonymous/invalid authentication: 401. Authenticated bundle: 200 and exact checksum parity.\\n')
+          PY
