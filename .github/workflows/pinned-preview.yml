@@ -194,6 +194,7 @@ jobs:
                       assert response.status == 200, name + ': HTTP ' + str(response.status)
                       for picture in page.locator('img').all():
                           picture.scroll_into_view_if_needed()
+                          picture.evaluate('(i)=>i.decode()')
                       page.locator('img[src="assets/hibiscus-product.webp"]').scroll_into_view_if_needed()
                       page.wait_for_function('Array.from(document.images).every(i=>i.complete && i.naturalWidth>0)')
                       page.evaluate('document.fonts.ready')
