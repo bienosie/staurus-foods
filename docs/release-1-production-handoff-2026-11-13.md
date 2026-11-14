@@ -39,3 +39,16 @@ The owner clarified that the long-term proposition is **African food and agricul
 Added a public **Insights** section and two buyer-oriented guides: `insights.html`, `insights-hibiscus-buyers.html` and `insights-trial-order.html`. The sitemap now has **16 URLs** and both website build and test page lists include these files. New articles focus on African sourcing, dried hibiscus standards, and first trial orders. This is a material post-approval source change.
 
 **DO NOT release the previously reviewed SHA or claim the new 16-page site has already been previewed.** Re-run the latest source CI, publish its matching immutable protected preview, verify all new pages, obtain approval for that exact full SHA, then run guarded CloudNext production with backup. The production enabled switch must remain false while preview/release checks fail.
+
+## 14 November 2026: Hibiscus asset and direct buyer enquiry release gate
+
+Owner requested replacement of the old illustrated hibiscus image with the owner-supplied dried calyces photograph and direct website submission (no mail application).
+
+- HTML references now target `site/assets/hibiscus-product.webp`. **This WebP is not yet present in GitHub** and must be imported from `Staurus_Foods_Hibiscus_Image_Import.zip`, including the exact directory path, before CI passes or release continues.
+- Enquiry form now POSTs to `api/enquiry.php` with inline success/failure. PHP endpoint was committed; it validates required fields, checks the product list and privacy acknowledgement, throttles submissions and attempts local PHP `mail()` delivery to `info@staurusfoods.com`.
+- No CRM, database or paid form service is required for this phase.
+- A `mail()` return of true means accepted by the local mail transport, **not independently delivered**. Test a valid enquiry through the live CloudNext PHP runtime and verify receipt in the actual mailbox. Test invalid submissions, honeypot, repeat sends/rate limit and failure messaging. CloudNext's PHP delivery support must be confirmed; if not reliable, implement authenticated SMTP with credentials held outside web roots, never in Git.
+- Preview build must continue disabling form submissions, including its PHP endpoint stub. Do not test live email sending against the preview.
+- PHP 8.1+ runtime is needed by the handler (`str_starts_with`, `never` type); verify CloudNext PHP version and ensure error messages do not disclose private information.
+- Update privacy notice and check actual retention/logging characteristics before go-live.
+- An earlier preview SHA is **not** an approval of these new files. Require the new image, latest CI, fresh immutable preview, owner visual approval and verified backup before live release.
