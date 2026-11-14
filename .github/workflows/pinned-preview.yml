@@ -117,6 +117,17 @@ jobs:
               path = pathlib.PurePosixPath(rel)
               assert not path.is_absolute() and '..' not in path.parts and not urlsplit(rel).scheme
               status, headers, data = get(base + rel, token)
+              if rel.endswith('.php'):
+                  assert status == 403, 'Preview PHP endpoint must reject submissions: ' + rel
+                  # PHP source hashes are verified over SFTP; HTTP must execute the disabled stub.
+                  request = urllib.request.Request(base + rel, data=b'test=blocked', headers={'Authorization': 'Basic ' + token, 'Content-Type': 'application/x-www-form-urlencoded'}, method='POST')
+                  try:
+                      with opener.open(request, timeout=30) as response:
+                          post_status, post_data = response.status, response.read()
+                  except urllib.error.HTTPError as error:
+                      post_status, post_data = error.code, error.read()
+                  assert post_status == 403 and json.loads(post_data).get('success') is False, 'Preview submission is not disabled'
+                  continue
               assert status == 200, 'Authenticated preview file failed: ' + rel
               assert hashlib.sha256(data).hexdigest() == checksum, 'HTTP checksum mismatch: ' + rel
               assert 'noindex' in headers.get('X-Robots-Tag', '').lower(), 'Preview header missing: ' + rel
