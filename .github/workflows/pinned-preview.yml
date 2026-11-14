@@ -184,6 +184,7 @@ jobs:
                   context.route('https://preview.staurusfoods.com/**',
                       lambda route: route.continue_(headers={**{k:v for k,v in route.request.headers.items() if k.lower() != 'authorization'},'authorization':'Basic ' + token}))
                   page = context.new_page()
+                  page.on('response', lambda response: print('Image response:',response.status,response.url) if response.request.resource_type == 'image' else None)
                   for name in ['index.html','commodities.html','hibiscus-flowers.html','insights.html']:
                       response = page.goto(base + name, wait_until='networkidle')
                       if response.status != 200:
@@ -194,7 +195,12 @@ jobs:
                       assert response.status == 200, name + ': HTTP ' + str(response.status)
                       for picture in page.locator('img').all():
                           picture.scroll_into_view_if_needed()
-                          picture.evaluate('(i)=>i.decode()')
+                          print('Checking image:',label,name,picture.get_attribute('src'))
+                          try:
+                              picture.evaluate('(i)=>i.decode()')
+                          except Exception:
+                              page.screenshot(path=str(output/(label + '-' + name.replace('.html','-image-error.png'))),full_page=True)
+                              raise
                       page.locator('img[src="assets/hibiscus-product.webp"]').scroll_into_view_if_needed()
                       page.wait_for_function('Array.from(document.images).every(i=>i.complete && i.naturalWidth>0)')
                       page.evaluate('document.fonts.ready')
