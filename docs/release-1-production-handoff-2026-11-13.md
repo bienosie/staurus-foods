@@ -3,13 +3,14 @@
 **Owner instruction:** Publish the Staurus Foods website to https://staurusfoods.com. The prior preview was approved visually, and the official buyer mailbox was confirmed operational. The current public-ready source incorporates SEO and legal-copy changes, so only a **matching fresh protected preview** can be used as the release fingerprint.
 
 ## Verified source preparation
-- 12 HTML pages have been edited to remove draft noindex and `approval-preview` metadata and temporary footer copy.
+- 13 HTML pages have been edited to remove draft noindex and `approval-preview` metadata and temporary footer copy.
 - `site/robots.txt` now allows crawling and advertises `https://staurusfoods.com/sitemap.xml`.
 - `site/sitemap.xml` contains the 12 canonical production URLs.
 - `site/assets/main.js` prepares enquiries to `info@staurusfoods.com` using `mailto:`. This is **not** an automatic server submission. The user must send the email.
 - The privacy and website terms pages have substantive public copy. Legal professional review is advisable; no unverified certifications, price guarantees or trading claims are added.
 - `tests/test_site.py` now tests the indexable source; `scripts/build.py --preview` adds noindex, form-disabling controls and a restrictive preview `robots.txt` separately.
 - The existing source SHA pinned to the former protected preview `a5b330e...` is obsolete for release. Do **not** use it.
+- **14 November 2026 change:** Dried hibiscus flowers (zobo/roselle) are now a priority initial commodity. The site has a dedicated `hibiscus-flowers.html` page, an original botanical illustration, homepage and commodities placement, enquiry form selection and a 13-URL sitemap. This changes the approved source. **Do not deploy or approve candidate `89a60834c0e8dc2261e6cd85343ffd8f36c22b4c` as the final version.** Obtain a fresh successful preview built from the latest head including hibiscus and record its new full SHA. If a release workflow is in progress, stop until the new version is approved.
 
 ## Deploy correctly without bypassing safeguards
 1. Inspect the latest **Validate Staurus Foods static site** result on `main`. Must be green for final head.
