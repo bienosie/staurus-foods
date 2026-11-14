@@ -63,7 +63,7 @@ jobs:
       - name: Verify authenticated HTTP pages, assets and protection
         env:
           REVIEWED_SHA: ${{ inputs.source_sha }}
-          PREVIEW_HTTP_USER: ${{ secrets.PREVIEW_HTTP_USER }}
+          PREVIEW_HTTP_USER: ${{ secrets.PREVIEW_HTTP_USER || 'staurus-preview' }}
           PREVIEW_HTTP_PASSWORD: ${{ secrets.PREVIEW_HTTP_PASSWORD }}
         run: |
           python - <<'PY'
@@ -76,7 +76,7 @@ jobs:
           user = os.environ.get('PREVIEW_HTTP_USER', '')
           password = os.environ.get('PREVIEW_HTTP_PASSWORD', '')
           if not user or not password:
-              raise SystemExit('Preview uploaded. Secure authentication required: configure PREVIEW_HTTP_USER and PREVIEW_HTTP_PASSWORD repository secrets, then rerun this workflow. Production must remain disabled.')
+              raise SystemExit('Preview uploaded. Secure authentication required: configure the PREVIEW_HTTP_PASSWORD repository secret (PREVIEW_HTTP_USER is optional), then rerun this workflow. Production must remain disabled.')
           token = base64.b64encode((user + ':' + password).encode()).decode()
           class NoRedirect(urllib.request.HTTPRedirectHandler):
               def redirect_request(self, *args, **kwargs):
