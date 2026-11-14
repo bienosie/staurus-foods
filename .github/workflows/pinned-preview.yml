@@ -165,7 +165,7 @@ jobs:
           PREVIEW_HTTP_PASSWORD: ${{ secrets.PREVIEW_HTTP_PASSWORD }}
         run: |
           python - <<'PY'
-          import base64, json, os, pathlib, re
+          import base64, json, os, pathlib, re, time
           from playwright.sync_api import sync_playwright
           sha = os.environ['REVIEWED_SHA']
           base = 'https://preview.staurusfoods.com/' + sha + '/'
@@ -181,8 +181,13 @@ jobs:
                   # Send Basic auth pre-emptively only to the protected preview origin.
                   # Never attach the header to external fonts or other hosts.
                   token = base64.b64encode((os.environ['PREVIEW_HTTP_USER'] + ':' + os.environ['PREVIEW_HTTP_PASSWORD']).encode()).decode()
-                  context.route('https://preview.staurusfoods.com/**',
-                      lambda route: route.continue_(headers={**{k:v for k,v in route.request.headers.items() if k.lower() != 'authorization'},'authorization':'Basic ' + token}))
+                  # Pace the review below CloudNext's anti-abuse request threshold.
+                  # Authentication routing disables the browser HTTP cache, so repeated
+                  # pages otherwise create an artificial image-request burst.
+                  def authorized_request(route):
+                      time.sleep(1.5)
+                      route.continue_(headers={**{k:v for k,v in route.request.headers.items() if k.lower() != 'authorization'},'authorization':'Basic ' + token})
+                  context.route('https://preview.staurusfoods.com/**',authorized_request)
                   page = context.new_page()
                   page.on('response', lambda response: print('Image response:',response.status,response.url) if response.request.resource_type == 'image' else None)
                   for name in ['index.html','commodities.html','hibiscus-flowers.html','insights.html']:
