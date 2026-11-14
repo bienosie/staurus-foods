@@ -41,6 +41,18 @@ class WebsiteChecks(unittest.TestCase):
         self.assertTrue((SITE / "sitemap.xml").is_file())
         self.assertNotIn("REPLACE_WITH_VERIFIED_COMPANY_EMAIL", (SITE / "assets" / "main.js").read_text())
 
+    def test_buyer_submission_contract(self):
+        form = (SITE / "enquire.html").read_text(encoding="utf-8")
+        js = (SITE / "assets" / "main.js").read_text(encoding="utf-8")
+        handler = (SITE / "api" / "enquiry.php").read_text(encoding="utf-8")
+        self.assertIn('action="api/enquiry.php"', form)
+        self.assertIn('Submit enquiry', form)
+        self.assertIn("fetch('api/enquiry.php'", js)
+        self.assertNotIn("window.location.href='mailto:", js)
+        self.assertIn("info@staurusfoods.com", handler)
+        self.assertTrue((SITE / "assets" / "hibiscus-product.webp").is_file())
+        self.assertNotIn("hibiscus-illustration.svg", (SITE / "index.html").read_text())
+
     def test_branding_is_present(self):
         self.assertTrue((SITE / "assets" / "staurus-logo.webp").is_file())
         self.assertIn("Staurus Foods", (SITE / "index.html").read_text())
