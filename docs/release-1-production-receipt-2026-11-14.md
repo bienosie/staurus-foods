@@ -79,17 +79,17 @@ Google Search Console was accessible in the existing account, but staurusfoods.c
 
 `google-site-verification=q4jc4tsnm7lLNm81HH1eZ-QKxEYjIukxmeBpMjY7xR8`
 
-No DNS change was made. The previously available CloudNext session had closed; reopening the account reached its login page. Domain verification, sitemap submission and homepage/commodity URL inspection therefore remain pending secure CloudNext access.
+At launch, DNS verification was pending. In the subsequent commissioning session on 14 November 2026, the owner signed into CloudNext and the Google TXT record above was added to the apex through StackCP. A before/after comparison confirmed all twelve existing DNS records, including MX and SPF, were unchanged; there are now thirteen records. Google confirmed Ownership verified using the Domain name provider method. The TXT record must remain in place. The sitemap was submitted, processed successfully, and Google reported twelve discovered pages. The live homepage test confirmed URL is available to Google and Page can be indexed. The index inspection still showed historical pre-launch redirect data. Cashew and cocoa inspections showed Discovered - currently not indexed; sesame and soya showed URL is unknown to Google in their inspection snapshots. No indexing claim is made and no manual indexing request was sent.
 
 Bing Webmaster Tools reached its sign-in/account chooser. Verification/import and sitemap submission remain pending sign-in. IndexNow was assessed as not yet configured; no key file, API key or paid service was introduced.
 
 ## F. Safety and follow-up
 
-`LIVE_RELEASE_ENABLED` was restored to `false` immediately after successful release and the false value was read back from GitHub repository variables. Preview protection remains active. Production hosting, email configuration, MX and DNS records were not changed. No purchases, hosting upgrades, new certifications or Release 2 CRM work occurred.
+`LIVE_RELEASE_ENABLED` was restored to `false` immediately after successful release and the false value was read back from GitHub repository variables. Preview protection remains active. Production hosting, email configuration and MX were not changed. DNS remained unchanged during launch; the subsequent Google commissioning added only the verification TXT record and preserved all pre-existing records. No purchases, hosting upgrades, new certifications or Release 2 CRM work occurred.
 
 Outstanding items do not prevent the verified public site being live:
 
 1. Diagnose normal Edge preview HTTP-auth prompt behaviour later.
-2. Secure CloudNext sign-in, add the Google verification TXT without altering existing records, verify the domain, submit sitemap and inspect main URLs.
+2. Google domain verification, sitemap submission and homepage/commodity URL inspection completed. Keep the verification TXT record. Monitor indexing after Google's next crawls.
 3. Secure Bing sign-in, verify/import the site and submit sitemap; then decide whether IndexNow is useful.
 4. Owner-assisted native mail-client and inbox delivery test.
