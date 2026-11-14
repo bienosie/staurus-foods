@@ -175,16 +175,22 @@ jobs:
           with sync_playwright() as p:
               browser = p.chromium.launch()
               for label, viewport in [('desktop',{'width':1440,'height':1000}),('mobile',{'width':390,'height':844})]:
-                  context = browser.new_context(viewport=viewport, http_credentials={
-                      'username':os.environ['PREVIEW_HTTP_USER'],'password':os.environ['PREVIEW_HTTP_PASSWORD']})
+                  context = browser.new_context(viewport=viewport,
+                      user_agent='StaurusFoods-Preview-Verification/1.0',
+                      extra_http_headers={'Cache-Control':'no-cache'})
                   # Send Basic auth pre-emptively only to the protected preview origin.
                   # Never attach the header to external fonts or other hosts.
                   token = base64.b64encode((os.environ['PREVIEW_HTTP_USER'] + ':' + os.environ['PREVIEW_HTTP_PASSWORD']).encode()).decode()
                   context.route('https://preview.staurusfoods.com/**',
-                      lambda route: route.continue_(headers={**route.request.headers,'Authorization':'Basic ' + token}))
+                      lambda route: route.continue_(headers={**{k:v for k,v in route.request.headers.items() if k.lower() != 'authorization'},'authorization':'Basic ' + token}))
                   page = context.new_page()
                   for name in ['index.html','commodities.html','hibiscus-flowers.html','insights.html']:
                       response = page.goto(base + name, wait_until='networkidle')
+                      if response.status != 200:
+                          page.screenshot(path=str(output/(label + '-access-error.png')),full_page=True)
+                          safe_headers = {k:v for k,v in response.headers.items() if k.lower() in {'server','x-origin-cache-status','x-cdn-cache-status','www-authenticate','location'}}
+                          print('Access diagnostic:',response.status,safe_headers)
+                          print('Authorization attached:',bool(response.request.all_headers().get('authorization')))
                       assert response.status == 200, name + ': HTTP ' + str(response.status)
                       for picture in page.locator('img').all():
                           picture.scroll_into_view_if_needed()
