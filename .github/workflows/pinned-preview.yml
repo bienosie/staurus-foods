@@ -153,3 +153,55 @@ jobs:
               summary.write('HTML pages: ' + str(pages) + '\\n')
               summary.write('Anonymous/invalid authentication: 401. Authenticated bundle: 200 and exact checksum parity.\\n')
           PY
+
+      - name: Install screenshot review browser
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Capture desktop and mobile hibiscus review
+        env:
+          REVIEWED_SHA: ${{ inputs.source_sha }}
+          PREVIEW_HTTP_USER: ${{ secrets.PREVIEW_HTTP_USER || 'staurus-preview' }}
+          PREVIEW_HTTP_PASSWORD: ${{ secrets.PREVIEW_HTTP_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          from playwright.sync_api import sync_playwright
+          sha = os.environ['REVIEWED_SHA']
+          base = 'https://preview.staurusfoods.com/' + sha + '/'
+          output = pathlib.Path('screenshots')
+          output.mkdir()
+          report = []
+          with sync_playwright() as p:
+              browser = p.chromium.launch()
+              for label, viewport in [('desktop',{'width':1440,'height':1000}),('mobile',{'width':390,'height':844})]:
+                  context = browser.new_context(viewport=viewport, http_credentials={
+                      'username':os.environ['PREVIEW_HTTP_USER'],'password':os.environ['PREVIEW_HTTP_PASSWORD']})
+                  page = context.new_page()
+                  for name in ['index.html','commodities.html','hibiscus-flowers.html','insights.html']:
+                      response = page.goto(base + name, wait_until='networkidle')
+                      assert response.status == 200, name
+                      page.locator('img[src="assets/hibiscus-product.webp"]').scroll_into_view_if_needed()
+                      page.wait_for_function('Array.from(document.images).every(i=>i.complete && i.naturalWidth>0)')
+                      page.evaluate('document.fonts.ready')
+                      assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), 'Horizontal overflow: ' + name
+                      item = page.locator('img[src="assets/hibiscus-product.webp"]')
+                      info = item.evaluate('(i)=>({naturalWidth:i.naturalWidth,naturalHeight:i.naturalHeight,alt:i.alt,width:i.width,height:i.height,fit:getComputedStyle(i).objectFit})')
+                      assert info['naturalWidth'] == 809 and info['naturalHeight'] == 752
+                      assert info['alt']
+                      if label == 'mobile':
+                          page.locator('#menu').click()
+                          assert page.locator('#navlinks').is_visible()
+                          page.locator('#menu').click()
+                      page.screenshot(path=str(output/(label + '-' + name.replace('.html','.png'))),full_page=True)
+                      report.append({'viewport':label,'page':name,'hibiscus':info})
+                  context.close()
+              browser.close()
+          (output/'review.json').write_text(json.dumps({'source_sha':sha,'checks':report},indent=2))
+          print('PASS: eight desktop/mobile image and layout checks; screenshots ready for visual review.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hibiscus-visual-review-${{ inputs.source_sha }}
+          path: screenshots/
+          retention-days: 30
