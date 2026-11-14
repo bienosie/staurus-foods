@@ -31,3 +31,11 @@
 - Server-side 403/404 after upload or missing indexable pages.
 
 No secrets, private keys or access tokens in this document.
+
+## 14 November 2026: Africa-wide positioning and Insights change
+
+The owner clarified that the long-term proposition is **African food and agricultural commodity sourcing**, with **Nigeria as the initial operating/supplier base**, not an exclusively Nigerian brand. Updated the homepage and company narrative accordingly. Retained precise Nigerian origin references on actual initial commodity product pages; no claims of established operations in other African countries.
+
+Added a public **Insights** section and two buyer-oriented guides: `insights.html`, `insights-hibiscus-buyers.html` and `insights-trial-order.html`. The sitemap now has **16 URLs** and both website build and test page lists include these files. New articles focus on African sourcing, dried hibiscus standards, and first trial orders. This is a material post-approval source change.
+
+**DO NOT release the previously reviewed SHA or claim the new 16-page site has already been previewed.** Re-run the latest source CI, publish its matching immutable protected preview, verify all new pages, obtain approval for that exact full SHA, then run guarded CloudNext production with backup. The production enabled switch must remain false while preview/release checks fail.
