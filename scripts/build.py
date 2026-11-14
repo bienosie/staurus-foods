@@ -24,7 +24,7 @@ def validate(source):
             if target and not (source / target).is_file():
                 raise ValueError(f'{page}: missing local asset {target}')
     for path in files:
-        if path.suffix not in {'.html', '.css', '.js', '.pdf', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.txt', '.xml'}:
+        if path.suffix not in {'.html', '.css', '.js', '.pdf', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.txt', '.xml', '.php'}:
             raise ValueError(f'Unexpected deployable file: {path}')
         if path.suffix == '.pdf' and not path.read_bytes().startswith(b'%PDF-'):
             raise ValueError(f'Invalid PDF: {path.name}')
@@ -64,6 +64,9 @@ def build(source, output, sha, preview=False):
         target = output / rel
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(data)
+        if preview and path.suffix == '.php':
+            # Never activate a functioning form endpoint in password-protected previews.
+            target.write_text("<?php http_response_code(403); header('Content-Type: application/json'); echo json_encode(['success'=>false,'message'=>'Preview form submissions are disabled.']); ?>\n")
         if preview and path.suffix == '.html':
             text = data.decode('utf-8')
             controls = '''<meta name="robots" content="noindex,nofollow,noarchive">
