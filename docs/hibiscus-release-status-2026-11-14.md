@@ -1,6 +1,6 @@
 # Hibiscus Release 1 deployment receipt
 
-14 November 2026, GMT. Production deployed successfully; final public asset-cache correction awaits CloudNext sign-in.
+14 November 2026, GMT. Production deployed successfully; hosting cache cleared and all 26 public file checks passed.
 
 ## A. Preview recovery
 
@@ -51,12 +51,12 @@ The production run retained Paramiko RejectPolicy and existing known-host pin.
 
 - Homepage HTTPS: 200. Live release.json: 200, source SHA matches reviewed hibiscus release, 26 files.
 - All 13 HTML pages return 200 and exactly match production SHA-256 hashes: homepage, catalogue, hibiscus, raw cashew, cocoa, sesame, soya, about, quality, enquiry, trade fairs, privacy and terms.
-- 24 of 26 public bundle file URLs match expected SHA-256 hashes. Both remaining mismatches are older StackCDN cache entries: assets/main.js and assets/style.css, HTTP 200, X-Origin-Cache-Status HIT and X-CDN-Cache-Status HIT, with pre-release Last-Modified times around 08:27 GMT.
-- Diagnostic requests for those two asset URLs with the reviewed SHA as a query parameter return 200, CDN MISS and exact expected current hashes. Origin uploads are correct; ordinary unversioned URLs require a CloudNext cache purge.
+- Final public verification: all 26 ordinary, unversioned bundle URLs returned HTTP 200 and exactly matched the reviewed production SHA-256 hashes. The live release.json exactly matched the reviewed production manifest. Homepage / also matched index.html.
+- Resolved a post-deployment cache issue: older JavaScript and CSS were served with origin/CDN cache HIT headers. After the owner signed in, the Staurus Foods hosting-package CDN purge reported CDN Purge Successful in CloudNext. Both normal asset URLs then returned the expected current hashes with origin and CDN MISS headers. A complete 26-file verification subsequently passed. No source changes or second production upload were required.
 - Corporate logo, commodity photographs and labelled hibiscus botanical illustration load. Hibiscus illustration is not represented as stock photography or evidence of available inventory.
 - Desktop hibiscus layout rendered correctly with loaded images. At 390 by 844, the mobile page had no horizontal overflow, readable content and a working navigation menu. The temporary viewport override was reset.
-- Hibiscus CTA opens enquire.html?commodity=hibiscus. The new option is present. Automatic preselection is currently affected by the stale main.js cache; manual selection remains available.
-- The exact reviewed JavaScript prepares mailto enquiries to info@staurusfoods.com. It does not send from the server. Native email-client opening and inbox receipt remain owner-assisted checks, not claimed complete.
+- Hibiscus CTA opens enquire.html?commodity=hibiscus. Dried hibiscus flowers is present in the form. A fresh browser load at the www hostname visibly selected Dried hibiscus flowers automatically. An older apex browser session retained the previously cached JavaScript; returning visitors may need to refresh their browser cache. The ordinary apex asset URL is independently verified as the correct new bytes.
+- An isolated execution of the exact reviewed JavaScript passed hibiscus query preselection and prepared a mailto enquiry to info@staurusfoods.com with subject Staurus Foods buyer enquiry: Dried hibiscus flowers, the expected form details, and the honeypot omitted. No email was sent. Native email-client opening and inbox receipt remain owner-assisted checks, not claimed complete.
 - No unverified inventory, laboratory certification or export-grade claims were added.
 
 ## E. SEO
@@ -70,12 +70,12 @@ The production run retained Paramiko RejectPolicy and existing known-host pin.
 - robots rules allow Googlebot, bingbot and OAI-SearchBot. Request tests establish ordinary public access, not access from every crawler IP or guaranteed AI citations.
 - IndexNow remains unconfigured. Recommended future addition through a separately reviewed release; no paid SEO service or new credential was introduced.
 
-## F. Safety and precise remaining work
+## F. Safety and follow-up
 
 LIVE_RELEASE_ENABLED was restored to false after successful production deployment and read back from GitHub repository variables. Preview protection remains enabled. Email, MX and DNS were not changed during this addendum. Existing Google TXT and Bing CNAME verification records remain as previously commissioned.
 
-The production release has succeeded and all 13 HTML pages are live. Final complete public-file integrity is not yet claimed because StackCDN still serves the old unversioned JavaScript and CSS.
+The production release, private backup, protected preview and final 26-file public integrity checks have passed. All 13 pages, including hibiscus, are live. The hosting cache issue is resolved. There is no remaining production release blocker.
 
-CloudNext is signed out. Owner must securely sign in at https://control.cloudnext.uk/ . Then purge the staurusfoods.com hosting/CDN cache, recheck both normal asset URL hashes, verify hibiscus preselection and complete the enquiry preparation check. No further production upload is needed for this cache correction.
+Recommended future release improvement: fingerprint CSS/JavaScript URLs in a separately reviewed build so returning visitors automatically receive changed assets without relying on browser-cache expiry. This was not introduced into the pinned 6e9ad053 release.
 
 Further follow-up: native email application/inbox delivery test with owner; search indexing and AI citation monitoring; normal Edge preview prompt behaviour. No hosting move, upgrade, purchases, unrelated DNS changes or CRM development occurred.
