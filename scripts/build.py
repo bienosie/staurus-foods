@@ -18,7 +18,7 @@ def validate(source):
     for page in ('index.html', 'commodities.html', 'enquire.html', 'about.html', 'quality.html', 'trade-fairs.html', 'privacy.html', 'terms.html', 'raw-cashew-nuts.html', 'cocoa-beans.html', 'sesame-seeds.html', 'soya-beans.html', 'hibiscus-flowers.html', 'insights.html', 'insights-hibiscus-buyers.html', 'insights-trial-order.html'):
         text = (source / page).read_text()
         for name in re.findall(r"(?:href|src)=[\"']([^\"']+)[\"']", text):
-            if name.startswith(('#', 'https:', 'http:', 'mailto:', 'data:', '${')):
+            if name.startswith(('#', 'https:', 'http:', 'mailto:', 'tel:', 'data:', '${')):
                 continue
             target = name.split('#')[0].split('?')[0]
             if target and not (source / target).is_file():
