@@ -1,0 +1,136 @@
+name: Staurus Foods isolated enquiry transport check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cloudnext-deployment
+  cancel-in-progress: false
+jobs:
+  transport:
+    if: github.ref == 'refs/heads/main'
+    environment: preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-deploy.txt
+      - name: Check protected CloudNext runtime and send one clearly labelled QA enquiry
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ vars.SFTP_PORT || '22' }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PRIVATE_KEY: ${{ secrets.SFTP_PRIVATE_KEY }}
+          SFTP_KNOWN_HOSTS: ${{ secrets.SFTP_KNOWN_HOSTS }}
+          PREVIEW_DIR: ${{ vars.PREVIEW_DIR }}
+          PRODUCTION_DIR: ${{ vars.PRODUCTION_DIR }}
+          PREVIEW_HTTP_USER: ${{ secrets.PREVIEW_HTTP_USER || 'staurus-preview' }}
+          PREVIEW_HTTP_PASSWORD: ${{ secrets.PREVIEW_HTTP_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import base64, hashlib, json, os, pathlib, re, sys, tempfile, urllib.request, urllib.error
+          import paramiko
+          sys.path.insert(0, 'scripts')
+          from deploy import required, root, disjoint, exists, write
+          # This transient test area is separate from immutable website previews.
+          # Their PHP stubs and disabled forms remain untouched.
+          run = required('GITHUB_RUN_ID')
+          assert re.fullmatch(r'[0-9]+', run)
+          name = 'transport-check-' + run
+          base = 'https://preview.staurusfoods.com/' + name + '/'
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, *args, **kwargs):
+                  return None
+          opener = urllib.request.build_opener(NoRedirect)
+          token = base64.b64encode((required('PREVIEW_HTTP_USER') + ':' + required('PREVIEW_HTTP_PASSWORD')).encode()).decode()
+          def http(rel, data=None, auth=True):
+              headers = {'Cache-Control':'no-cache', 'User-Agent':'StaurusFoods-Protected-QA/1.0'}
+              if auth:
+                  headers['Authorization'] = 'Basic ' + token
+              if data is not None:
+                  headers['Content-Type'] = 'application/x-www-form-urlencoded'
+              req = urllib.request.Request(base + rel, headers=headers, data=data)
+              try:
+                  with opener.open(req, timeout=30) as res:
+                      return res.status, res.read()
+              except urllib.error.HTTPError as err:
+                  return err.code, err.read()
+          with tempfile.TemporaryDirectory() as td:
+              known = pathlib.Path(td) / 'known_hosts'
+              known.write_text(required('SFTP_KNOWN_HOSTS') + '\n')
+              client = paramiko.SSHClient()
+              client.load_host_keys(str(known))
+              client.set_missing_host_key_policy(paramiko.RejectPolicy())
+              options = dict(hostname=required('SFTP_HOST'), port=int(os.getenv('SFTP_PORT','22')),
+                  username=required('SFTP_USER'), allow_agent=False, look_for_keys=False,
+                  timeout=30, auth_timeout=30, banner_timeout=30)
+              if os.getenv('SFTP_PRIVATE_KEY'):
+                  key = pathlib.Path(td) / 'key'
+                  key.write_text(required('SFTP_PRIVATE_KEY') + '\n')
+                  key.chmod(0o600)
+                  options['key_filename'] = str(key)
+              else:
+                  options['password'] = required('SFTP_PASSWORD')
+              client.connect(**options)
+              try:
+                  with client.open_sftp() as sftp:
+                      preview = root(sftp,'PREVIEW_DIR')
+                      production = root(sftp,'PRODUCTION_DIR')
+                      disjoint(preview, production)
+                      testdir = preview + '/' + name
+                      if exists(sftp,testdir):
+                          raise ValueError('Test directory already exists; inspect before retry')
+                      sftp.mkdir(testdir)
+                      created = []
+                      try:
+                          def upload(filename, data):
+                              created.append(filename)
+                              write(sftp, testdir + '/' + filename, data)
+                          upload('guard.txt', b'protected-transport-QA')
+                          assert http('guard.txt',auth=False)[0] == 401, 'Anonymous access must be denied before PHP is uploaded'
+                          assert http('guard.txt') == (200,b'protected-transport-QA'), 'Authenticated guard failed'
+                          probe = b"<?php header('Content-Type: application/json'); header('Cache-Control: no-store'); echo json_encode(['php'=>PHP_VERSION,'mail_available'=>function_exists('mail'),'temp_writable'=>is_writable(sys_get_temp_dir())]);"
+                          upload('runtime.php', probe)
+                          status, body = http('runtime.php')
+                          assert status == 200
+                          runtime = json.loads(body)
+                          assert tuple(map(int,runtime['php'].split('.')[:2])) >= (8,1), 'PHP 8.1+ is required'
+                          assert runtime['mail_available'] and runtime['temp_writable'], 'Required runtime functions unavailable'
+                          print('CloudNext runtime:',json.dumps(runtime))
+                          handler = pathlib.Path('site/api/enquiry.php').read_bytes()
+                          upload('enquiry.php', handler)
+                          assert http('enquiry.php',auth=False)[0] == 401
+                          assert http('enquiry.php')[0] == 405
+                          assert http('enquiry.php', b'name=')[0] == 400
+                          assert http('enquiry.php', b'website=spam.example')[0] == 200
+                          from urllib.parse import urlencode
+                          reference = 'SF-QA-' + run
+                          payload = dict(name='Staurus Foods Release QA', company='Staurus Foods Limited internal test',
+                              email='info@staurusfoods.com', destination='United Kingdom', commodity='Dried hibiscus flowers',
+                              quantity='QA test only - no commercial order', type='Product quotation',
+                              requirements=reference + ' | Protected CloudNext transport test. No stock reservation, purchase or shipment requested.',
+                              privacy_confirmation='Accepted', submitted_at='1', website='')
+                          status, body = http('enquiry.php',urlencode(payload).encode())
+                          result = json.loads(body)
+                          assert status == 200 and result.get('success') is True, 'Actual CloudNext transport rejected QA enquiry'
+                          print('QA reference:',reference)
+                          print('Handler SHA256:',hashlib.sha256(handler).hexdigest())
+                          print('Transport response:',json.dumps(result))
+                          print('ACCEPTED ONLY. Actual receipt must still be checked in info@staurusfoods.com before publication.')
+                          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as summary:
+                              summary.write('CloudNext PHP: ' + runtime['php'] + '\n\nQA reference: ' + reference + '\n\nAccepted for delivery only. Inbox receipt remains mandatory.\n')
+                      finally:
+                          for filename in reversed(created):
+                              if exists(sftp,testdir + '/' + filename):
+                                  sftp.remove(testdir + '/' + filename)
+                          sftp.rmdir(testdir)
+                          print('Transient protected QA files removed; immutable previews and production untouched.')
+              finally:
+                  client.close()
+          PY
