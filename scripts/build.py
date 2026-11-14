@@ -61,6 +61,10 @@ def build(source, output, sha, preview=False):
         rel = path.relative_to(source).as_posix()
         data = path.read_bytes()
         source_hashes[rel] = digest(data)
+        if path.suffix == '.html':
+            # A new release must not reuse a browser-cached enquiry implementation.
+            data = data.replace(b'src="assets/main.js"',
+                                ('src="assets/main.js?v=' + sha[:12] + '"').encode())
         target = output / rel
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(data)
