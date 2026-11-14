@@ -21,12 +21,20 @@ class WebsiteChecks(unittest.TestCase):
         for page in PAGES:
             html = (SITE / page).read_text(encoding="utf-8")
             for value in re.findall(r'(?:href|src)=["\']([^"\']+)["\']', html):
-                if value.startswith(("#", "https:", "http:", "mailto:", "data:")):
+                if value.startswith(("#", "https:", "http:", "mailto:", "tel:", "data:")):
                     continue
                 local = value.split("?", 1)[0].split("#", 1)[0]
                 if local:
                     with self.subTest(page=page, target=local):
                         self.assertTrue((SITE / local).is_file(), f"Missing asset: {local}")
+
+    def test_contact_links(self):
+        for page in PAGES:
+            html = (SITE / page).read_text(encoding="utf-8")
+            for target in ("tel:+2348070710922", "tel:+447892105439",
+                           "tel:+12103294634", "https://wa.me/2348070710922"):
+                with self.subTest(page=page, target=target):
+                    self.assertIn('href="' + target + '"', html)
 
     def test_public_source_is_indexing_ready(self):
         # The preview build independently injects noindex and disallows crawling.
