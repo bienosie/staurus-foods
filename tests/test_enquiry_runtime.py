@@ -41,7 +41,7 @@ class EnquiryRuntimeChecks(unittest.TestCase):
         result = subprocess.run(['php', '-d', 'display_errors=0', '-d',
             'sys_temp_dir=' + str(self.root), '-d',
             'sendmail_path=' + ('/bin/false' if failure else str(self.sendmail)), str(harness)],
-            env={**os.environ, 'SF_TEST_MAIL': str(self.sink)}, capture_output=True, text=True, check=True)
+            env={**os.environ, 'SF_CRM_ENABLED': 'false', 'SF_TEST_MAIL': str(self.sink)}, capture_output=True, text=True, check=True)
         return int(result.stderr.split('STATUS:')[-1]), json.loads(result.stdout)
 
     def test_syntax(self):

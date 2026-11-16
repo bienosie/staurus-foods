@@ -1,0 +1,9 @@
+Options -Indexes
+<IfModule mod_headers.c>
+  Header always set Cache-Control "no-store"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "no-referrer"
+  Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://*.supabase.co; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+</IfModule>

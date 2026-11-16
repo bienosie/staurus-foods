@@ -87,7 +87,10 @@ try {
     flock($fp, LOCK_UN); fclose($fp);
 }
 $labels = ['name'=>'Name', 'company'=>'Company', 'email'=>'Email', 'destination'=>'Destination', 'commodity'=>'Commodity', 'quantity'=>'Quantity', 'type'=>'Enquiry type', 'requirements'=>'Requirements'];
+require_once __DIR__ . '/crm.php';
+$crmId = sf_crm_submit($values, $_POST);
 $lines = ["New buyer enquiry received through staurusfoods.com", ""];
+if ($crmId !== null) $lines[] = 'CRM enquiry reference: ' . $crmId;
 foreach ($labels as $key=>$label) {
     $lines[] = $label . ': ' . $values[$key];
 }
@@ -99,6 +102,9 @@ $headers = ['From: Staurus Foods Website <info@staurusfoods.com>', 'Reply-To: ' 
 $accepted = @mail('info@staurusfoods.com', $subject, $message, implode("\r\n", $headers));
 if (!$accepted) {
     error_log('Staurus Foods enquiry transport rejected message');
+    if ($crmId !== null) {
+        reply(200, 'Thank you. Your enquiry has been recorded. We will review it and respond by email.');
+    }
     reply(503, 'We could not submit your enquiry. Please email info@staurusfoods.com directly.');
 }
 reply(200, 'Thank you. Your enquiry has been accepted for delivery. We will review it and respond by email.');

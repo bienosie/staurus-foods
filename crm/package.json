@@ -1,0 +1,16 @@
+{
+  "name": "staurus-foods-buyer-crm",
+  "version": "0.1.0",
+  "description": "Private Staurus Foods buyer pipeline",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check web/app.js && node --check web/api.js",
+    "dev": "node tests/preview.mjs"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.16",
+    "happy-dom": "21.0.4"
+  },
+  "private": true
+}

@@ -1,0 +1,34 @@
+name: Phase 2 buyer CRM checks
+on:
+  workflow_dispatch:
+  push:
+    paths: ['crm/**', 'site/api/**', 'site/assets/main.js', 'tests/**', '.github/workflows/crm-check.yml']
+  pull_request:
+    paths: ['crm/**', 'site/api/**', 'site/assets/main.js', 'tests/**', '.github/workflows/crm-check.yml']
+permissions:
+  contents: read
+jobs:
+  isolated-crm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: crm/package-lock.json
+      - run: npm ci
+        working-directory: crm
+      - run: npm run check && npm test
+        working-directory: crm
+      - name: PHP syntax and isolated transport checks
+        run: |
+          php -l site/api/enquiry.php
+          php -l site/api/crm.php
+          python -m unittest discover -s tests -v
+      - name: Verify unchanged release packaging controls
+        run: |
+          python scripts/build.py --output dist/preview --sha "$GITHUB_SHA" --preview
+          python scripts/build.py --output dist/production --sha "$GITHUB_SHA"

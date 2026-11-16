@@ -11,6 +11,8 @@ document.getElementById('menu')?.addEventListener('click',()=>{
 });
 const buyerForm=document.getElementById('buyer-form');
 if(buyerForm){
+  let enquiryRequestId=window.crypto?.randomUUID?.();
+  buyerForm.addEventListener('input',()=>{enquiryRequestId=window.crypto?.randomUUID?.();});
   const button=buyerForm.querySelector('button[type="submit"]');
   const status=document.getElementById('form-status');
   const timestamp=buyerForm.querySelector('[name="submitted_at"]');
@@ -19,6 +21,11 @@ if(buyerForm){
     event.preventDefault();
     if(!buyerForm.reportValidity()) return;
     const body=new URLSearchParams(new FormData(buyerForm));
+    if(enquiryRequestId) body.set('request_id',enquiryRequestId);
+    const campaign=new URLSearchParams(window.location.search);
+    ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(key=>{
+      if(campaign.has(key)) body.set(key,campaign.get(key).slice(0,150));
+    });
     if(body.get('website')) return;
     button.disabled=true;
     status.textContent='Sending your enquiry securely...';
@@ -35,6 +42,7 @@ if(buyerForm){
       if(!response.ok || !result.success) throw new Error(result.message||'Unable to send the enquiry.');
       status.textContent=result.message;
       buyerForm.reset();
+      enquiryRequestId=window.crypto?.randomUUID?.();
       if(timestamp) timestamp.value=String(Math.floor(Date.now()/1000));
     }catch(err){
       status.textContent=(err?.message||'Unable to submit the enquiry.')+' Alternatively email info@staurusfoods.com directly.';

@@ -1,5 +1,12 @@
 # Release 2: Staurus Foods buyer enquiry CRM (not a launch dependency)
 
+## Build status, 16 November 2026
+The owner requested the Phase 2 build. The first implementation is in `crm/`,
+with an optional, disabled-by-default website relay in `site/api/crm.php`.
+See `crm/README.md` for implemented scope, isolated checks, operational limits
+and the commissioning sequence. No live database or staff account has yet been
+provisioned by this build. Release 1 deployment safeguards remain in force.
+
 ## Decision
 Release 1: public B2B static website on CloudNext, working verified inbox, product pages, SEO and search console registration. No backend database required for launch.
 Release 2: minimal, permission-controlled contact database for buyer qualification, samples and quotations.
