@@ -39,9 +39,9 @@ Only reads and the stable read-only `sf_access_role` RPC are called. There are n
 
 ## Remaining dependency and commissioning
 
-Connect Supabase to inspect the owner's projects and establish a dedicated managed staging target. Do not infer project ID, plan, region, staff access or hosted results from this source. Check current connection state before proceeding and establish costs before creating billable resources.
+Managed staging was provisioned on 17 November 2026 in the separate Staurus Foods account. The schema is already applied. See [the managed staging receipt](../docs/phase-2-managed-staging-receipt-2026-11-17.md) for the exact target, source hash, hosted permission checks and remaining work. Do not rerun the non-idempotent initial schema or assume the connected Supabase app has switched from the property account.
 
-Then inspect ownership, select the isolated target, apply the migration, arrange staff access through a supported secure flow, deploy the protected bundle and record hosted checks. An authorised synthetic website-to-database-and-inbox test, backup/restore rehearsal and rollback checks are still required before live activation.
+Next arrange staff access through a supported secure flow, deploy the protected bundle and record managed Auth/HTTP checks. An authorised synthetic website-to-database-and-inbox test, backup/restore rehearsal and rollback checks are still required before live activation.
 
 Technical references checked 17 November 2026:
 - https://docs.postgrest.org/en/stable/references/configuration.html
