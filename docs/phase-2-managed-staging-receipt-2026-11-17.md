@@ -60,3 +60,13 @@ The connected Supabase app still lists only the original property account. Brows
 Next: provision the owner's application login securely, explicitly assign CRM membership, complete managed editor/viewer/non-member Auth and HTTP checks, configure and deploy the protected staging bundle, test website-to-CRM/email delivery with authorised synthetic data, and rehearse backup/restore and rollback. Public signup being disabled means staff must be provisioned administratively.
 
 No CRM web deployment, live enquiry capture, staff invitation, buyer email, production release or paid upgrade was performed in this stage. The existing 47 isolated/CI checks are recorded separately and are not counted as new managed-service tests.
+
+## Owner access and public HTTP checks
+
+The owner subsequently created the application Auth user for info@staurusfoods.com and explicitly confirmed this was to be the CRM administrator account. The account was checked for the observed UUID and a verified email before adding its membership. Readback confirmed `role=admin`, `active=true`, `email_confirmed=true`. The user's password was neither requested in chat nor read by the agent. This application login is separate from the Supabase platform account and the database password.
+
+Using only the project's public publishable key, actual HTTPS requests to each of the six `/rest/v1/sf_*` table endpoints returned **401 / PostgreSQL code 42501**. All six anonymous read-denial checks passed. The real `/auth/v1/settings` response also confirmed `disable_signup=true` and anonymous sign-ins disabled. These are managed HTTP checks, not locally simulated responses. They do not yet verify authenticated administrator login or viewer/editor separation.
+
+Built the protected CRM bundle from clean source commit `3be1475d4745c9ecbbbb0bbc24cbb4f4d344f2de`, with seven hashed application/control files plus the release manifest. Configuration contains only the dedicated staging origin and its public publishable key. Its Basic-auth file path is the previously verified `/home/sites/10b/f/ffe8ba666a/private-auth/.htpasswd.txt`; that file and protection still require current host verification before upload.
+
+Deployment paused because Edge reported that another extension UI was open on the CloudNext tab and blocked automation. No CloudNext file was uploaded or changed. Dismiss that panel before resuming host inspection. Retain the existing website and immutable previews, select a separate CRM staging destination, verify authentication and headers, then perform genuine staff sign-in and managed role tests.
