@@ -7,6 +7,12 @@ See `crm/README.md` for implemented scope, isolated checks, operational limits
 and the commissioning sequence. No live database or staff account has yet been
 provisioned by this build. Release 1 deployment safeguards remain in force.
 
+## Staging preparation, 17 November 2026
+The review branch now includes a separate protected CRM package builder, a
+read-only hosted verification command and a disposable PostgreSQL/PostgREST
+HTTP integration job. See `crm/STAGING.md`. A managed staging connection and
+end-to-end website delivery remain to be commissioned.
+
 ## Decision
 Release 1: public B2B static website on CloudNext, working verified inbox, product pages, SEO and search console registration. No backend database required for launch.
 Release 2: minimal, permission-controlled contact database for buyer qualification, samples and quotations.

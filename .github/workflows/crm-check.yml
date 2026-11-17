@@ -32,3 +32,52 @@ jobs:
         run: |
           python scripts/build.py --output dist/preview --sha "$GITHUB_SHA" --preview
           python scripts/build.py --output dist/production --sha "$GITHUB_SHA"
+  postgres-http:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: sf_crm_test
+          POSTGRES_PASSWORD: sf_fixture_only
+        ports: ['55432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sf_crm_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      SF_CRM_TEST_MODE: ephemeral-ci
+      PGHOST: 127.0.0.1
+      PGPORT: '55432'
+      PGUSER: postgres
+      PGPASSWORD: sf_fixture_only
+      PGDATABASE: sf_crm_test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: crm/package-lock.json
+      - run: npm ci
+        working-directory: crm
+      - name: Initialise disposable database
+        run: node tests/http/prepare.mjs --prepare
+        working-directory: crm
+      - name: Start local PostgREST
+        run: |
+          docker run -d --name sf-crm-postgrest --network host \
+            -e PGRST_DB_URI=postgres://authenticator:sf_fixture_only@127.0.0.1:55432/sf_crm_test \
+            -e PGRST_DB_SCHEMAS=public \
+            -e PGRST_DB_ANON_ROLE=anon \
+            -e PGRST_JWT_SECRET=staurus-foods-ci-only-signing-key-0000000000000000 \
+            -e PGRST_SERVER_HOST=127.0.0.1 \
+            -e PGRST_SERVER_PORT=33000 \
+            postgrest/postgrest:v16.6
+      - name: Exercise real database HTTP contracts
+        run: node --test tests/http/postgrest.test.mjs
+        working-directory: crm
+      - name: Stop disposable API
+        if: always()
+        run: docker rm -f sf-crm-postgrest || true

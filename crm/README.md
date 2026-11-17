@@ -14,6 +14,10 @@ This is the first implemented slice of `docs/release-2-buyer-crm.md`. It is not 
 
 The commercial stages follow the agreed brief. A stage marked `won` is an operational label, not evidence that money has cleared, margin is validated or stock can be purchased. Quotation amounts retain currency, price basis and named Incoterm location; the interface does not add incompatible monetary amounts.
 
+## Staging preparation
+
+Phase 2B adds a protected staging bundle builder, a read-only hosted verifier and a real PostgreSQL/PostgREST integration job. See [STAGING.md](STAGING.md) for commands, access requirements and the remaining managed-service checks. These tools do not activate live capture.
+
 ## Isolated checks
 
 ```sh

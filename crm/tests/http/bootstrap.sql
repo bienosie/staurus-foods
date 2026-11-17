@@ -1,0 +1,16 @@
+-- Disposable CI database only. No external account credentials or buyer data.
+create role anon nologin;
+create role authenticated nologin;
+create role service_role nologin bypassrls;
+create role authenticator noinherit login password 'sf_fixture_only';
+grant anon, authenticated, service_role to authenticator;
+create schema auth;
+create table auth.users(id uuid primary key);
+create function auth.uid() returns uuid language sql stable as $$
+  select nullif(current_setting('request.jwt.claims',true)::jsonb->>'sub','')::uuid
+$$;
+create function auth.role() returns text language sql stable as $$
+  select current_setting('request.jwt.claims',true)::jsonb->>'role'
+$$;
+grant usage on schema auth,public to anon,authenticated,service_role;
+grant execute on function auth.uid(),auth.role() to anon,authenticated,service_role;

@@ -4,13 +4,16 @@
   "description": "Private Staurus Foods buyer pipeline",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check web/app.js && node --check web/api.js",
-    "dev": "node tests/preview.mjs"
+    "check": "node --check web/app.js && node --check web/api.js && node --check scripts/build-staging.mjs && node --check scripts/verify-hosted.mjs",
+    "dev": "node tests/preview.mjs",
+    "build:staging": "node scripts/build-staging.mjs",
+    "verify:hosted": "node scripts/verify-hosted.mjs"
   },
   "type": "module",
   "devDependencies": {
     "@electric-sql/pglite": "0.5.16",
-    "happy-dom": "21.0.4"
+    "happy-dom": "21.0.4",
+    "pg": "8.23.1"
   },
   "private": true
 }
