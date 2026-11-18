@@ -1,6 +1,6 @@
 # Staurus Foods buyer CRM, Phase 2A
 
-This implements the first buyer CRM described in `docs/release-2-buyer-crm.md`. A dedicated London Supabase staging database and the owner's application account are provisioned on the Free plan. The CRM website is not deployed and live capture remains disabled. See [the managed staging receipt](../docs/phase-2-managed-staging-receipt-2026-11-17.md) for completed checks and commissioning limits. All fixtures use synthetic, isolated data and are excluded from the deployable `web/` folder.
+This implements the first buyer CRM described in `docs/release-2-buyer-crm.md`. A dedicated London Supabase staging database and the owner's application account are provisioned on the Free plan. The CRM is deployed to a password-protected staging URL; authenticated application checks are pending and live capture remains disabled. See [the managed staging receipt](../docs/phase-2-managed-staging-receipt-2026-11-17.md) and [staging deployment receipt](../docs/phase-2-staging-deployment-2026-11-18.md) for completed checks and commissioning limits. All fixtures use synthetic, isolated data and are excluded from the deployable `web/` folder.
 
 ## Implemented
 

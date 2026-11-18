@@ -1,0 +1,95 @@
+[
+  {
+    "path": "/",
+    "status": 401,
+    "authentication": "Basic realm=\"Staurus Foods CRM staging\"",
+    "no_store": true,
+    "noindex": true,
+    "frame_denied": true,
+    "nosniff": true,
+    "csp_project": true,
+    "passed": true
+  },
+  {
+    "path": "index.html",
+    "status": 401,
+    "authentication": "Basic realm=\"Staurus Foods CRM staging\"",
+    "no_store": true,
+    "noindex": true,
+    "frame_denied": true,
+    "nosniff": true,
+    "csp_project": true,
+    "passed": true
+  },
+  {
+    "path": "api.js",
+    "status": 401,
+    "authentication": "Basic realm=\"Staurus Foods CRM staging\"",
+    "no_store": true,
+    "noindex": true,
+    "frame_denied": true,
+    "nosniff": true,
+    "csp_project": true,
+    "passed": true
+  },
+  {
+    "path": "app.js",
+    "status": 401,
+    "authentication": "Basic realm=\"Staurus Foods CRM staging\"",
+    "no_store": true,
+    "noindex": true,
+    "frame_denied": true,
+    "nosniff": true,
+    "csp_project": true,
+    "passed": true
+  },
+  {
+    "path": "styles.css",
+    "status": 401,
+    "authentication": "Basic realm=\"Staurus Foods CRM staging\"",
+    "no_store": true,
+    "noindex": true,
+    "frame_denied": true,
+    "nosniff": true,
+    "csp_project": true,
+    "passed": true
+  },
+  {
+    "path": "config.js",
+    "status": 401,
+    "authentication": "Basic realm=\"Staurus Foods CRM staging\"",
+    "no_store": true,
+    "noindex": true,
+    "frame_denied": true,
+    "nosniff": true,
+    "csp_project": true,
+    "passed": true
+  },
+  {
+    "path": "robots.txt",
+    "status": 401,
+    "authentication": "Basic realm=\"Staurus Foods CRM staging\"",
+    "no_store": true,
+    "noindex": true,
+    "frame_denied": true,
+    "nosniff": true,
+    "csp_project": true,
+    "passed": true
+  },
+  {
+    "path": "release.json",
+    "status": 401,
+    "authentication": "Basic realm=\"Staurus Foods CRM staging\"",
+    "no_store": true,
+    "noindex": true,
+    "frame_denied": true,
+    "nosniff": true,
+    "csp_project": true,
+    "passed": true
+  },
+  {
+    "check": "incorrect_credentials_rejected",
+    "status": 401,
+    "passed": true
+  }
+]
