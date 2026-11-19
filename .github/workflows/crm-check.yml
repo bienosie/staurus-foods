@@ -1,6 +1,11 @@
 name: Phase 2 buyer CRM checks
 on:
   workflow_dispatch:
+    inputs:
+      verify_staging:
+        description: Read-only HTTP verification of the deployed shea butter CRM bundle
+        type: boolean
+        default: false
   push:
     paths: ['crm/**', 'supabase/migrations/**', 'site/api/**', 'site/assets/main.js', 'tests/**', '.github/workflows/crm-check.yml']
   pull_request:
@@ -8,6 +13,40 @@ on:
 permissions:
   contents: read
 jobs:
+  protected-staging-http:
+    if: github.event_name == 'workflow_dispatch' && inputs.verify_staging && github.ref == 'refs/heads/feature/phase-2-buyer-crm'
+    environment: preview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Rebuild the exact deployed source without credentials
+        env:
+          SF_CRM_URL: https://fpseihhfrkhpbmpahqgm.supabase.co
+          SF_CRM_PUBLISHABLE_KEY: sb_publishable_88jdiBAo13pn4rigd6QyOw_LdYze293
+          SF_CRM_AUTH_FILE: /home/sites/10b/f/ffe8ba666a/private-auth/.htpasswd.txt
+        run: |
+          git merge-base --is-ancestor 7c8635486ca85df1c0cecdc30d820cbb6770f99a HEAD
+          git worktree add --detach "$RUNNER_TEMP/crm-staging-source" 7c8635486ca85df1c0cecdc30d820cbb6770f99a
+          cd "$RUNNER_TEMP/crm-staging-source"
+          node crm/scripts/build-staging.mjs
+      - name: Verify protected HTTP files without buyer writes
+        env:
+          PREVIEW_HTTP_USER: ${{ secrets.PREVIEW_HTTP_USER || 'staurus-preview' }}
+          PREVIEW_HTTP_PASSWORD: ${{ secrets.PREVIEW_HTTP_PASSWORD }}
+        run: |
+          python crm/scripts/verify-staging-http.py --bundle "$RUNNER_TEMP/crm-staging-source/dist/crm-staging-7c8635486ca85df1c0cecdc30d820cbb6770f99a" > crm-http-verification.json
+          cat crm-http-verification.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crm-protected-http-verification
+          path: crm-http-verification.json
+          retention-days: 30
   isolated-crm:
     runs-on: ubuntu-latest
     steps:
@@ -23,6 +62,7 @@ jobs:
         working-directory: crm
       - run: npm run check && npm test
         working-directory: crm
+      - run: python -m unittest discover -s crm/tests -p 'test_*.py' -v
       - name: PHP syntax and isolated transport checks
         run: |
           php -l site/api/enquiry.php
