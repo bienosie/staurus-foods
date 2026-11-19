@@ -41,7 +41,9 @@ Only reads and the stable read-only `sf_access_role` RPC are called. There are n
 
 Managed staging was provisioned on 17 November 2026 in the separate Staurus Foods account. The schema is already applied. See [the managed staging receipt](../docs/phase-2-managed-staging-receipt-2026-11-17.md) for the exact target, source hash, hosted permission checks and remaining work. Do not rerun the non-idempotent initial schema or assume the connected Supabase app has switched from the property account.
 
-Next arrange staff access through a supported secure flow, deploy the protected bundle and record managed Auth/HTTP checks. An authorised synthetic website-to-database-and-inbox test, backup/restore rehearsal and rollback checks are still required before live activation.
+The owner account is provisioned and the owner has confirmed application login and the Shea butter dropdown. The protected bundle is deployed and exact authenticated HTTP parity passed on 19 November; see `../docs/phase-2-shea-butter-2026-11-19.md`. The verifier in `scripts/verify-staging-http.py` uses only GET requests to the fixed CloudNext preview origin. Existing preview credentials stay in the workflow secret environment and redirects are refused. Its checks do not authenticate to Supabase or write buyer records.
+
+Managed Auth role separation and authenticated buyer write/readback are still pending. An authorised synthetic website-to-database-and-inbox test, backup/restore rehearsal and rollback checks are also required before live activation.
 
 Technical references checked 17 November 2026:
 - https://docs.postgrest.org/en/stable/references/configuration.html

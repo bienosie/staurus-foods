@@ -22,4 +22,12 @@ https://preview.staurusfoods.com/crm-7c8635486ca85df1c0cecdc30d820cbb6770f99a/
 
 Installed `.htaccess` first and confirmed authentication before the other files; installed `index.html` last. All eight editor buffers matched the built bundle, the final listing confirmed all files, and the saved `app.js` was reopened and compared in full. All eight anonymous HTTP access and security-header checks passed. Evidence: `docs/evidence/crm-shea-butter-access-2026-11-19.json`. Screenshot: `docs/evidence/crm-shea-butter-database-2026-11-19.jpg`.
 
-The previous preview releases remain unchanged. Owner browser verification of the new dropdown is still pending; the connected browser does not expose the working InPrivate session. The public website changes remain prepared in the branch and await the website release process. No production website publication, outbound message or live CRM capture activation occurred. Broader Phase 2 commissioning remains incomplete.
+The previous preview releases remain unchanged. The owner's 19 November screenshot confirms Shea butter selected in the Record buyer enquiry form. This confirms the dropdown, not a saved buyer record. The connected browser does not expose that working InPrivate session.
+
+## Authenticated HTTP verification
+
+The read-only `protected-staging-http` job passed on 19 November at 07:34 UTC in [CRM checks #20](https://github.com/bienosie/staurus-foods/actions/runs/44480630174). It rebuilt the exact deployed source and compared all seven HTTP-readable files, including the manifest, byte for byte. Anonymous requests returned 401; authenticated requests returned 200; no-store, noindex, content-type protection, frame denial, referrer policy and the exact Foods Supabase connection policy passed. Apache configuration was not exposed. Report: `docs/evidence/crm-authenticated-http-2026-11-19.json`.
+
+The job uses existing preview credentials only on the fixed preview origin, refuses redirects and accepts only the exact file allowlist. Secrets are available only to the owned commissioning branch's push job or an explicit manual run, never pull-request events. Four negative/control tests cover redirects, unexpected paths, changed bytes and weakened headers. The isolated CRM, PHP and PostgreSQL HTTP jobs also passed.
+
+The public website change was isolated in PR #3 and merged for the owner's authorised publication. Its release outcome is recorded separately. No outbound message or live CRM capture activation occurred during these checks. Managed Auth role separation, authenticated buyer write/readback, backup restoration and end-to-end inbox commissioning remain outstanding.
