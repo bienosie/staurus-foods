@@ -6,6 +6,18 @@ The API client stored native `fetch` on its own instance and invoked it as `this
 
 A regression test exercises the default transport through login, staff-role verification and an authenticated enquiry read, requiring the global receiver. It failed before the repair and passed afterwards. All 22 CRM tests and the JavaScript syntax checks passed.
 
-Deployment is pending. The existing preview still serves the previous bundle. CloudNext returned Access Denied for the previously used hosting package, and an open Edge extension interface then blocked navigation to Manage Hosting. Resume after the owner restores hosting access and dismisses the extension interface. Build a new protected staging bundle from the repair commit and verify actual browser sign-in before declaring the login repaired on the hosted preview.
+## Protected preview deployed
+
+After the owner restored access, StackCP was found attached to the Staurus Direct package. Opening the Staurus Foods package through the existing CloudNext account restored the correct hosting session without changing permissions.
+
+Installed a new protected release from commit `881904ab8cdb541eff1418384952d6b30c7ddb1b` at:
+
+https://preview.staurusfoods.com/crm-881904ab8cdb541eff1418384952d6b30c7ddb1b/
+
+The previous release folder remains unchanged. Installed `.htaccess` first, verified its authentication challenge, then saved the seven remaining bundle files with `index.html` last. Every editor buffer matched the local bundle exactly before saving. The final listing confirmed all eight files. Reopened the saved `api.js` and confirmed its full contents matched the repaired source.
+
+All eight anonymous HTTP checks passed: the folder and seven public files require Basic authentication and return the expected no-store, noindex, nosniff, frame-denial and restricted connection headers. Evidence: `docs/evidence/crm-login-fix-access-2026-11-19.json`.
+
+Actual staff sign-in and authenticated HTTP checksum verification remain pending. The owner's working InPrivate browser session is not available to automation. Use the new release URL in that session and sign in with the existing CRM staff account. Do not treat deployment and mocked regression tests as proof of a successful managed Supabase login or completed CRM commissioning.
 
 No passwords were read, changed or requested in chat. No production release or live buyer capture was enabled.

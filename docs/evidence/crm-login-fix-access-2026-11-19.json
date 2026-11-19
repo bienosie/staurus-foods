@@ -1,0 +1,95 @@
+{
+  "checked_at": "2026-11-19T06:12:01.450601+00:00",
+  "base_url": "https://preview.staurusfoods.com/crm-881904ab8cdb541eff1418384952d6b30c7ddb1b/",
+  "checks": [
+    {
+      "path": "./",
+      "status": 401,
+      "challenge": "Basic realm=\"Staurus Foods CRM staging\"",
+      "no_store": true,
+      "noindex": true,
+      "nosniff": true,
+      "frame_denied": true,
+      "restricted_connect": true,
+      "passed": true
+    },
+    {
+      "path": "api.js",
+      "status": 401,
+      "challenge": "Basic realm=\"Staurus Foods CRM staging\"",
+      "no_store": true,
+      "noindex": true,
+      "nosniff": true,
+      "frame_denied": true,
+      "restricted_connect": true,
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "status": 401,
+      "challenge": "Basic realm=\"Staurus Foods CRM staging\"",
+      "no_store": true,
+      "noindex": true,
+      "nosniff": true,
+      "frame_denied": true,
+      "restricted_connect": true,
+      "passed": true
+    },
+    {
+      "path": "styles.css",
+      "status": 401,
+      "challenge": "Basic realm=\"Staurus Foods CRM staging\"",
+      "no_store": true,
+      "noindex": true,
+      "nosniff": true,
+      "frame_denied": true,
+      "restricted_connect": true,
+      "passed": true
+    },
+    {
+      "path": "config.js",
+      "status": 401,
+      "challenge": "Basic realm=\"Staurus Foods CRM staging\"",
+      "no_store": true,
+      "noindex": true,
+      "nosniff": true,
+      "frame_denied": true,
+      "restricted_connect": true,
+      "passed": true
+    },
+    {
+      "path": "robots.txt",
+      "status": 401,
+      "challenge": "Basic realm=\"Staurus Foods CRM staging\"",
+      "no_store": true,
+      "noindex": true,
+      "nosniff": true,
+      "frame_denied": true,
+      "restricted_connect": true,
+      "passed": true
+    },
+    {
+      "path": "release.json",
+      "status": 401,
+      "challenge": "Basic realm=\"Staurus Foods CRM staging\"",
+      "no_store": true,
+      "noindex": true,
+      "nosniff": true,
+      "frame_denied": true,
+      "restricted_connect": true,
+      "passed": true
+    },
+    {
+      "path": "index.html",
+      "status": 401,
+      "challenge": "Basic realm=\"Staurus Foods CRM staging\"",
+      "no_store": true,
+      "noindex": true,
+      "nosniff": true,
+      "frame_denied": true,
+      "restricted_connect": true,
+      "passed": true
+    }
+  ],
+  "passed": true
+}
