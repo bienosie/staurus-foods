@@ -18,6 +18,10 @@ The previous release folder remains unchanged. Installed `.htaccess` first, veri
 
 All eight anonymous HTTP checks passed: the folder and seven public files require Basic authentication and return the expected no-store, noindex, nosniff, frame-denial and restricted connection headers. Evidence: `docs/evidence/crm-login-fix-access-2026-11-19.json`.
 
-Actual staff sign-in and authenticated HTTP checksum verification remain pending. The owner's working InPrivate browser session is not available to automation. Use the new release URL in that session and sign in with the existing CRM staff account. Do not treat deployment and mocked regression tests as proof of a successful managed Supabase login or completed CRM commissioning.
+## Owner-confirmed browser sign-in
+
+The owner's screenshot `image(20261119-061645).png`, supplied on 19 November 2026, shows the exact repaired release URL in Edge InPrivate, the `Signed in` confirmation, `Staff · Admin`, and the loaded Buyer desk with zero enquiries and no error banner. This confirms actual administrator sign-in and initial dashboard loading on the deployed repair. The original browser invocation failure is resolved for this observed login.
+
+The screenshot is owner-supplied evidence, not an automated browser trace. The connected browser still exposes only a separate unauthenticated preview tab, so the owner's InPrivate session cannot be exercised through the available browser connection. Authenticated HTTP checksum verification, controlled synthetic enquiry creation and progress, hosted role separation, audit verification and the remaining commissioning checks are still pending. Successful sign-in does not establish those outcomes or complete Phase 2 commissioning.
 
 No passwords were read, changed or requested in chat. No production release or live buyer capture was enabled.
