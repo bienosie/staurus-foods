@@ -1,13 +1,19 @@
-# Shea butter website release checkpoint, 19 November 2026
+# Shea butter website publication, 19 November 2026
 
-Ready for production; not yet published. Stephen authorised publication with “please publish and continue”. PR #3 merged as `27600b6806d027927a7a3deea6c9807f4a04292a`. Scope: public dropdown, PHP commodity allowlist and runtime test. Inbox delivery is preserved; the Phase 2 CRM relay is excluded.
+Published the owner's authorised shea butter enquiry update to https://staurusfoods.com/enquire.html . Source: `27600b6806d027927a7a3deea6c9807f4a04292a`, merged through PR #3. Scope: public commodity dropdown, PHP allowlist and runtime test. Existing inbox delivery is preserved. This release does not activate the Phase 2 CRM relay or publish the staff interface.
 
-Validation CI #116 passed: https://github.com/bienosie/staurus-foods/actions/runs/44479889100
-Pinned preview #14 passed: https://github.com/bienosie/staurus-foods/actions/runs/44480101987
-Authenticated HTTP parity and all 16 pages passed; 32 desktop/mobile checks passed. Enquiry screenshots at both sizes were visually reviewed. Preview artifact 14508466086; visual artifact 14508880991.
+## Release evidence
 
-Last public manifest: `784c9e9c9c01e18950f5a82bc650829f9a77adba`. LIVE_RELEASE_ENABLED was confirmed false. Saving true opened GitHub Confirm access; the edit is not confirmed saved. No production workflow dispatched. The owner must complete GitHub Mobile or password verification in the marked tab.
+- [Validation CI #116](https://github.com/bienosie/staurus-foods/actions/runs/44479889100): passed, including PHP runtime tests.
+- [Pinned preview #14](https://github.com/bienosie/staurus-foods/actions/runs/44480101987): passed. All 16 pages, authenticated HTTP checksums, protected paths and disabled preview submissions verified. All 32 desktop/mobile page checks passed; enquiry screenshots at both sizes were visually reviewed.
+- [Production release #6](https://github.com/bienosie/staurus-foods/actions/runs/44483638328): passed. Job `135421654160` verified the reviewed source, pre-release backup and production file hashes. Completion logged at 08:03 UTC.
+- Verified backup: `/home/sites/10b/f/ffe8ba666a/private-backups/20261119T075841381433Z-27600b6806d027927a7a3deea6c9807f4a04292a`.
+- `LIVE_RELEASE_ENABLED=false` was saved and confirmed after deployment. `PREVIEW_ENABLED` and `PREVIEW_PROTECTION_VERIFIED` remain true.
+- Live browser selection of Shea butter verified. A normal reload was needed to replace the browser's cached previous form. Screenshot: `evidence/shea-live-form-2026-11-19.jpg`. No live enquiry was submitted.
+- Independent public HTTP verification passed for all 30 manifest entries: 29 static files matched their exact hashes, and the PHP endpoint rejected GET with 405. All 16 pages have their intended production canonical URLs, valid internal targets and no noindex controls. Public and CRM previews still require authentication; private paths remain hidden. Evidence: `evidence/shea-production-http-2026-11-19.json`. The first scan incorrectly expected an index.html canonical for the homepage; the checker was corrected to the existing root canonical and the complete scan then passed.
 
-Resume: verify the saved release switch, dispatch release.yml on main with reviewed_sha `27600b6806d027927a7a3deea6c9807f4a04292a` and Stephen's 19 November approval reference. Record the verified backup, verify public hashes and shea butter selection, then restore LIVE_RELEASE_ENABLED=false and confirm preview protection. No live synthetic enquiry is needed for this option-only release.
+## Phase 2 continuation
 
-CRM authenticated HTTP parity independently passed in run 44480630174. Broader commissioning remains pending; see phase-2-shea-butter-2026-11-19.md.
+Authenticated CRM HTTP file parity passed separately in [CRM checks #20](https://github.com/bienosie/staurus-foods/actions/runs/44480630174). Seven readable files exactly match the rebuilt deployed bundle; anonymous access is rejected and security headers are present. The owner has confirmed login and the Shea butter dropdown.
+
+The broader CRM remains in protected staging. Managed Auth role separation, authenticated buyer write/readback, backup restoration and end-to-end inbox commissioning are still required before live capture. The source and evidence remain in draft PR #2.

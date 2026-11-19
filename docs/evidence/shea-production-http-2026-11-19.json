@@ -1,0 +1,163 @@
+{
+  "source_sha": "27600b6806d027927a7a3deea6c9807f4a04292a",
+  "mode": "production",
+  "passed": true,
+  "html_pages": 16,
+  "checks": [
+    {
+      "file": "about.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "api/enquiry.php",
+      "status": 405,
+      "get_rejected": true
+    },
+    {
+      "file": "assets/brand-mark.svg",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/cashew.webp",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/cocoa.webp",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/favicon.png",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/hibiscus-product.webp",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/main.js",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/sesame.webp",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/soybeans.webp",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/staurus-logo.webp",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/style.css",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "assets/warehouse.webp",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "cocoa-beans.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "commodities.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "enquire.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "hibiscus-flowers.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "index.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "insights-hibiscus-buyers.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "insights-trial-order.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "insights.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "privacy.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "quality.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "raw-cashew-nuts.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "robots.txt",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "sesame-seeds.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "sitemap.xml",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "soya-beans.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "terms.html",
+      "status": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "trade-fairs.html",
+      "status": 200,
+      "checksum": "passed"
+    }
+  ],
+  "shea_butter_option": true,
+  "preview_requires_authentication": true,
+  "crm_requires_authentication": true,
+  "private_paths_hidden": true,
+  "live_enquiry_submitted": false
+}
