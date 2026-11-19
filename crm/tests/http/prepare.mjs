@@ -35,6 +35,7 @@ if (process.argv.includes("--prepare")) {
         "utf8",
       ),
     );
+    await client.query(await readFile(new URL("../../../supabase/migrations/20261119063327_add_shea_butter.sql", import.meta.url), "utf8"));
     for (const [role, id] of Object.entries(users)) {
       await client.query("insert into auth.users values($1)", [id]);
       if (role !== "outsider")

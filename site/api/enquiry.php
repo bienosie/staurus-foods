@@ -57,7 +57,7 @@ if (!filter_var($values['email'], FILTER_VALIDATE_EMAIL)) {
 if ((string)($_POST['privacy_confirmation'] ?? '') !== 'Accepted') {
     reply(400, 'Please confirm you have read the privacy notice.');
 }
-$permittedProducts = ['Dried hibiscus flowers', 'Raw cashew nuts', 'Cocoa beans', 'Sesame seeds', 'Soya beans', 'Other dry agricultural commodity'];
+$permittedProducts = ['Dried hibiscus flowers', 'Raw cashew nuts', 'Cocoa beans', 'Sesame seeds', 'Soya beans', 'Shea butter', 'Other dry agricultural commodity'];
 if (!in_array($values['commodity'], $permittedProducts, true)) {
     reply(400, 'Please choose a valid commodity.');
 }

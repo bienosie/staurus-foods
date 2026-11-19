@@ -17,6 +17,7 @@ const products = [
   "Soya beans",
   "Raw cashew nuts",
   "Cocoa beans",
+  "Shea butter",
   "Other dry agricultural commodity",
 ];
 const terms = [

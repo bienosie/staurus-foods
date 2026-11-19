@@ -55,6 +55,7 @@ before(async () => {
         name,
       ]);
   }
+  await db.exec(await readFile(new URL("../../supabase/migrations/20261119063327_add_shea_butter.sql", import.meta.url), "utf8"));
 });
 after(async () => db.close());
 test("anonymous and signed-in outsiders cannot ingest or read buyer data", async () => {
@@ -233,6 +234,18 @@ test("audit is recorded, excludes payloads, and staff cannot read or alter priva
     events.some((r) => r.entity === "sf_quotes" && r.operation === "UPDATE"),
   );
   assert.ok(!JSON.stringify(events).includes(payload.email));
+});
+test("staff can record and read back shea butter with its specification", async () => {
+  await identity("editor");
+  await db.exec("begin");
+  try {
+    const id = await create(crypto.randomUUID(), { ...payload, commodity: "Shea butter", requirements: "TEST ONLY: unrefined, buyer-defined grade" });
+    const rows = (await db.query("select commodity,specification from public.sf_enquiries where id=$1", [id])).rows;
+    assert.equal(rows[0].commodity, "Shea butter");
+    assert.equal(rows[0].specification, "TEST ONLY: unrefined, buyer-defined grade");
+  } finally {
+    await db.exec("rollback");
+  }
 });
 test("revoked staff immediately lose read and RPC access", async () => {
   await db.exec("reset role");

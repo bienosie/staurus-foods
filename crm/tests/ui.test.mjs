@@ -22,6 +22,7 @@ test("staff interface loads, filters, renders untrusted text safely and clears o
   globalThis.fetch = window.fetch;
   await import("../web/app.js");
   const $ = (id) => document.getElementById(id);
+  assert.ok(Array.from($("create-commodity").options).some(option => option.value === "Shea butter"));
   const settle = () => new Promise((resolve) => setTimeout(resolve, 30));
   const login = $("login-form");
   login.elements.email.value = "fixture@example.invalid";

@@ -2,9 +2,9 @@ name: Phase 2 buyer CRM checks
 on:
   workflow_dispatch:
   push:
-    paths: ['crm/**', 'site/api/**', 'site/assets/main.js', 'tests/**', '.github/workflows/crm-check.yml']
+    paths: ['crm/**', 'supabase/migrations/**', 'site/api/**', 'site/assets/main.js', 'tests/**', '.github/workflows/crm-check.yml']
   pull_request:
-    paths: ['crm/**', 'site/api/**', 'site/assets/main.js', 'tests/**', '.github/workflows/crm-check.yml']
+    paths: ['crm/**', 'supabase/migrations/**', 'site/api/**', 'site/assets/main.js', 'tests/**', '.github/workflows/crm-check.yml']
 permissions:
   contents: read
 jobs:

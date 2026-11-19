@@ -49,7 +49,7 @@ class EnquiryRuntimeChecks(unittest.TestCase):
 
     def test_correct_details_and_all_products(self):
         for product in ['Dried hibiscus flowers','Raw cashew nuts','Cocoa beans','Sesame seeds',
-                        'Soya beans','Other dry agricultural commodity']:
+                        'Soya beans','Shea butter','Other dry agricultural commodity']:
             status, body = self.invoke({'commodity': product}, {'REMOTE_ADDR': product})
             self.assertEqual(status, 200)
             self.assertTrue(body['success'])
