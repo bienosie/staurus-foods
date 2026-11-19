@@ -13,7 +13,7 @@ export function validateConfig(config) {
   }
 }
 export class Api {
-  constructor(config, fetcher = fetch) {
+  constructor(config, fetcher = globalThis.fetch.bind(globalThis)) {
     this.config = config;
     this.fetcher = fetcher;
     this.token = null;

@@ -7,6 +7,25 @@ const config = {
 };
 const jwt = (role) =>
   "eyJhbGciOiJIUzI1NiJ9." + btoa(JSON.stringify({ role })) + ".signature";
+test("default browser transport keeps the global receiver through login and staff reads", async (t) => {
+  const calls = [];
+  t.mock.method(globalThis, "fetch", async function (url, options) {
+    // Native browser fetch rejects a receiver such as the Api instance.
+    assert.equal(this, globalThis, "fetch must receive the browser global");
+    calls.push({ url, options });
+    return new Response(JSON.stringify(
+      url.includes("/token") ? { access_token: "test-token" } :
+      url.includes("/rpc/") ? "admin" : [],
+    ), { status: 200 });
+  });
+  const api = new Api(config);
+  assert.equal(await api.login("fixture@example.invalid", "test-only"), "admin");
+  assert.deepEqual(await api.request("/rest/v1/sf_enquiries?select=id"), []);
+  assert.equal(calls.length, 3);
+  assert.equal(calls[0].options.headers.Authorization, undefined);
+  assert.equal(calls[1].options.headers.Authorization, "Bearer test-token");
+  assert.equal(calls[2].options.credentials, "omit");
+});
 test("browser config rejects secret keys, service-role JWTs and arbitrary origins", () => {
   assert.ok(validateConfig(config));
   assert.ok(validateConfig({ ...config, publishableKey: jwt("anon") }));
