@@ -8,6 +8,18 @@ The CLI-generated migration `supabase/migrations/20261119063327_add_shea_butter.
 
 Validation: all 23 CRM tests and syntax checks pass. Tests include selecting the new option and recording/reading back a synthetic shea butter enquiry through the restricted staff RPC. All six static website checks pass. Fourteen PHP runtime/transport tests were skipped locally because PHP CLI is unavailable; the existing CI supplies that runtime and must pass before website release.
 
-Deployment remains pending. The Supabase connector still lists only the property initiative's projects, so it cannot apply changes to the separate Staurus Foods project. The correct Supabase browser tab is present, but Edge reported that another extension interface blocks automation. No managed schema change, hosted CRM update, production website release or external message occurred in this step.
+## Deployed and verified
 
-Resume by dismissing the blocking Edge extension panel, applying the new migration to `fpseihhfrkhpbmpahqgm`, verifying the managed constraint and a rolled-back synthetic staff intake, then deploying a new protected CRM bundle. Website source changes await the existing website release process and approval; keep real buyer capture disabled until commissioning is complete.
+The owner cleared the browser blocker. Applied the migration through the SQL Editor of the separate Staurus Foods staging project `fpseihhfrkhpbmpahqgm`. The original constraint was inspected first, and the final constraint was read back with Shea butter included. This was a manual SQL application, not a migration-history entry.
+
+Verified the hosted RPCs under the authenticated database role and the existing administrator's claim inside a rolled-back transaction: shea butter intake, staff readback, idempotent retry, status progression and rejection of a stale version all passed. This is a database-role simulation, not a browser or Auth token test. Follow-up queries confirmed row-level security remains enabled and zero test contacts or intake requests remained. An initial rehearsal failed to parse because the SQL editor retained part of the preceding text; it was replaced using select-all and paste and exact clipboard comparison before the successful run. The failed rehearsal did not save test data.
+
+GitHub Phase 2 buyer CRM checks #16 passed for source `7c8635486ca85df1c0cecdc30d820cbb6770f99a`: https://github.com/bienosie/staurus-foods/actions/runs/44473257827 . This covers the PHP and PostgreSQL HTTP checks unavailable in the local runtime.
+
+Installed a new protected CRM bundle at:
+
+https://preview.staurusfoods.com/crm-7c8635486ca85df1c0cecdc30d820cbb6770f99a/
+
+Installed `.htaccess` first and confirmed authentication before the other files; installed `index.html` last. All eight editor buffers matched the built bundle, the final listing confirmed all files, and the saved `app.js` was reopened and compared in full. All eight anonymous HTTP access and security-header checks passed. Evidence: `docs/evidence/crm-shea-butter-access-2026-11-19.json`. Screenshot: `docs/evidence/crm-shea-butter-database-2026-11-19.jpg`.
+
+The previous preview releases remain unchanged. Owner browser verification of the new dropdown is still pending; the connected browser does not expose the working InPrivate session. The public website changes remain prepared in the branch and await the website release process. No production website publication, outbound message or live CRM capture activation occurred. Broader Phase 2 commissioning remains incomplete.
