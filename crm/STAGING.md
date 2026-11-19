@@ -6,7 +6,9 @@ This stage prepares a protected CRM bundle and tests the application against a r
 
 The `postgres-http` CI job runs PostgreSQL 17 and PostgREST v16.6 with synthetic identities. It checks anonymous and forged-token rejection, simultaneous duplicate submissions, the dashboard's nested organisation/contact query, outsider/viewer restrictions, stage changes and stale writes, sample/quote readback, audit records and staff revocation.
 
-No workflow secret is required. Both services exist only within that job. The harness refuses non-loopback database hosts and any database name other than `sf_crm_test`. The signing key and database credentials are disposable fixtures. The synthetic Auth functions and locally signed JWTs do **not** verify managed Supabase Auth, real staff login, CloudNext delivery or backup restoration.
+No workflow secret is required. Both services exist only within that job. The harness refuses non-loopback database hosts and any source database name other than `sf_crm_test`. The signing key and database credentials are disposable fixtures. The synthetic Auth functions and locally signed JWTs do **not** verify managed Supabase Auth, real staff login or CloudNext delivery.
+
+After the HTTP checks, CI takes a custom-format `pg_dump`, restores it into a new `sf_crm_restore` database in the same disposable PostgreSQL instance, and verifies populated table data, RLS policies, effective object privileges, definitions and sequence state. It also exercises viewer denial, outsider denial, staff revocation, progression and stale-write rejection against the restored copy. Rehearsal transactions roll back; sequence allocations can advance on the copy. The source remains unchanged. The dump stays in runner temporary storage; only a result summary is uploaded. Cluster roles are shared and are not restored by this test. This does **not** prove managed Supabase backup, Auth recovery, Storage recovery or recovery onto a fresh cluster.
 
 ## Protected staging package
 
@@ -43,7 +45,9 @@ Managed staging was provisioned on 17 November 2026 in the separate Staurus Food
 
 The owner account is provisioned and the owner has confirmed application login and the Shea butter dropdown. The protected bundle is deployed and exact authenticated HTTP parity passed on 19 November; see `../docs/phase-2-shea-butter-2026-11-19.md`. The verifier in `scripts/verify-staging-http.py` uses only GET requests to the fixed CloudNext preview origin. Existing preview credentials stay in the workflow secret environment and redirects are refused. Its checks do not authenticate to Supabase or write buyer records.
 
-Managed Auth role separation and authenticated buyer write/readback are still pending. An authorised synthetic website-to-database-and-inbox test, backup/restore rehearsal and rollback checks are also required before live activation.
+The disposable backup/restore rehearsal passed on 19 November 2026. The actual Foods dashboard was also checked: its Free plan does not include project backups. See [the recovery receipt](../docs/phase-2-recovery-rehearsal-2026-11-19.md). No paid upgrade or managed backup was performed.
+
+Managed Auth role separation and authenticated buyer write/readback are still pending. An authorised synthetic website-to-database-and-inbox test, a configured and tested backup/restore arrangement for the hosted project, and deployment rollback checks are also required before live activation. The current Supabase connector still lists the property account, not Foods. Use Foods-specific access for the remaining managed checks; never reuse another initiative's project or credentials.
 
 Technical references checked 17 November 2026:
 - https://docs.postgrest.org/en/stable/references/configuration.html

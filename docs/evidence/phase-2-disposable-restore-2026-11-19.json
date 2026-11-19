@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "scope": "disposable PostgreSQL 17 backup/restore",
+  "tables": 10,
+  "exact_data_and_controls": true,
+  "viewer_read_and_write_denial": true,
+  "outsider_denied": true,
+  "revocation_preserved": true,
+  "progress_and_stale_write_checks": true,
+  "rehearsal_rolled_back": true,
+  "source_unchanged": true,
+  "not_tested": [
+    "Managed Supabase backup",
+    "Supabase Auth recovery",
+    "Global roles on a new cluster",
+    "Storage objects",
+    "Inbox delivery"
+  ]
+}
