@@ -1,0 +1,5 @@
+crm/node_modules/
+crm/.env
+crm/web/config.js
+dist/
+__pycache__/

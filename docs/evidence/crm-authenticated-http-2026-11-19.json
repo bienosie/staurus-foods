@@ -1,0 +1,59 @@
+{
+  "source_sha": "7c8635486ca85df1c0cecdc30d820cbb6770f99a",
+  "base_url": "https://preview.staurusfoods.com/crm-7c8635486ca85df1c0cecdc30d820cbb6770f99a/",
+  "passed": true,
+  "checks": [
+    {
+      "file": "api.js",
+      "anonymous": 401,
+      "authenticated": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "app.js",
+      "anonymous": 401,
+      "authenticated": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "config.js",
+      "anonymous": 401,
+      "authenticated": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "index.html",
+      "anonymous": 401,
+      "authenticated": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "robots.txt",
+      "anonymous": 401,
+      "authenticated": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "styles.css",
+      "anonymous": 401,
+      "authenticated": 200,
+      "checksum": "passed"
+    },
+    {
+      "file": "release.json",
+      "anonymous": 401,
+      "authenticated": 200,
+      "checksum": "passed"
+    }
+  ],
+  "apache_config_hidden": true,
+  "not_tested": [
+    "Supabase Auth",
+    "buyer writes",
+    "inbox delivery",
+    "backup restore"
+  ],
+  "workflow_run": "https://github.com/bienosie/staurus-foods/actions/runs/44480630174",
+  "job_id": 135411703345,
+  "artifact_id": 14508271933
+}

@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Buyer desk | Staurus Foods</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="config.js" defer></script>
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header>
+      <div>
+        <span class="eyebrow">STAURUS FOODS</span>
+        <h1>Buyer desk</h1>
+      </div>
+      <div id="session">
+        <span id="role-label">Private workspace</span
+        ><button id="logout" hidden>Sign out</button>
+      </div>
+    </header>
+    <main>
+      <p id="notice" role="status" aria-live="polite"></p>
+      <section id="login-panel" class="card narrow">
+        <p class="eyebrow">BUYER RELATIONSHIPS</p>
+        <h2>From first enquiry to repeat order.</h2>
+        <p>
+          Sign in with your assigned staff account to manage buyer requirements,
+          samples and quotations.
+        </p>
+        <form id="login-form">
+          <label
+            >Business email<input
+              name="email"
+              type="email"
+              autocomplete="username"
+              required /></label
+          ><label
+            >Password<input
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required /></label
+          ><button type="submit">Sign in securely</button>
+        </form>
+        <p class="small">
+          Access is invitation only. A buyer enquiry does not create a staff
+          account.
+        </p>
+      </section>
+      <section id="workspace" hidden>
+        <div class="metrics">
+          <article class="card">
+            <span>Open enquiries</span><strong id="metric-open">0</strong>
+          </article>
+          <article class="card">
+            <span>Follow-ups due</span><strong id="metric-due">0</strong>
+          </article>
+          <article class="card">
+            <span>Won enquiries</span><strong id="metric-won">0</strong>
+          </article>
+        </div>
+        <div class="toolbar">
+          <div>
+            <p class="eyebrow">COMMERCIAL PIPELINE</p>
+            <h2>Buyer enquiries</h2>
+          </div>
+          <div class="actions">
+            <button id="refresh" class="secondary">Refresh</button
+            ><button id="export" class="secondary">
+              Export displayed enquiries</button
+            ><button id="new-enquiry" data-editor>Record enquiry</button>
+          </div>
+        </div>
+        <div class="filters">
+          <label
+            >Search company, contact or commodity<input
+              id="search"
+              type="search"
+              placeholder="Search enquiries" /></label
+          ><label
+            >Stage<select id="filter-status">
+              <option value="">All stages</option>
+            </select></label
+          ><label class="check"
+            ><input id="due-only" type="checkbox" /> Follow-ups due</label
+          >
+        </div>
+        <p id="load-summary" class="small"></p>
+        <div class="card table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Buyer</th>
+                <th>Requirement</th>
+                <th>Stage</th>
+                <th>Next action</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="enquiry-rows"></tbody>
+          </table>
+          <p id="empty">
+            No enquiries yet. Record a genuine buyer enquiry to begin.
+          </p>
+        </div>
+        <button id="load-more" class="secondary" hidden>
+          Load older enquiries
+        </button>
+        <section id="detail" class="card" hidden aria-labelledby="detail-title">
+          <div class="toolbar">
+            <h2 id="detail-title"></h2>
+            <button id="close-detail" class="secondary">Close</button>
+          </div>
+          <p id="detail-meta"></p>
+          <p id="detail-spec" class="prewrap"></p>
+          <form id="verification-form" class="inline" data-editor>
+            <label
+              >Organisation verification<select name="verification">
+                <option value="unverified">Unverified</option>
+                <option value="in_review">In review</option>
+                <option value="verified">Verified</option>
+                <option value="rejected">Rejected</option>
+              </select></label
+            ><button>Save verification</button>
+          </form>
+          <p class="small">
+            Verify against evidence before changing this status. Verification is
+            not credit approval.
+          </p>
+          <div class="detail-grid">
+            <section>
+              <h3>Next action</h3>
+              <form id="progress-form" data-editor>
+                <label
+                  >Pipeline stage<select
+                    name="status"
+                    id="progress-status"
+                  ></select></label
+                ><label
+                  >Follow-up date and time (your local time)<input
+                    name="next_action_at"
+                    type="datetime-local" /></label
+                ><label
+                  >Activity note<textarea
+                    name="notes"
+                    maxlength="4000"
+                    required
+                    placeholder="What happened and what should happen next?"
+                  ></textarea></label
+                ><button>Save action</button>
+              </form>
+              <h3>Activity history</h3>
+              <ul id="activities" class="timeline"></ul>
+            </section>
+            <section>
+              <h3>Samples</h3>
+              <div id="samples"></div>
+              <form id="sample-form" data-editor>
+                <label
+                  >Lot reference<input
+                    name="lot_id"
+                    maxlength="200"
+                    required /></label
+                ><label
+                  >Dispatch date<input
+                    name="dispatch_date"
+                    type="date" /></label
+                ><label
+                  >Tracking reference<input
+                    name="tracking_reference"
+                    maxlength="300"
+                /></label>
+                <div class="pair">
+                  <label
+                    >Cost<input
+                      name="cost"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      required /></label
+                  ><label
+                    >Currency<input
+                      name="currency"
+                      value="GBP"
+                      pattern="[A-Z]{3}"
+                      maxlength="3"
+                      required
+                  /></label>
+                </div>
+                <button>Record sample</button>
+              </form>
+            </section>
+            <section>
+              <h3>Quotations</h3>
+              <div id="quotes"></div>
+              <form id="quote-form" data-editor>
+                <label
+                  >Quote reference<input
+                    name="quote_reference"
+                    maxlength="100"
+                    required
+                /></label>
+                <div class="pair">
+                  <label
+                    >Price<input
+                      name="price"
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      required /></label
+                  ><label
+                    >Currency<input
+                      name="currency"
+                      value="USD"
+                      pattern="[A-Z]{3}"
+                      maxlength="3"
+                      required
+                  /></label>
+                </div>
+                <label
+                  >Price basis<input
+                    name="price_basis"
+                    placeholder="For example, per metric tonne"
+                    maxlength="200"
+                    required
+                /></label>
+                <div class="pair">
+                  <label
+                    >Incoterm<select
+                      name="incoterm"
+                      id="quote-incoterm"
+                    ></select></label
+                  ><label
+                    >Valid until<input name="valid_until" type="date" required
+                  /></label>
+                </div>
+                <label
+                  >Named place or port<input
+                    name="named_place"
+                    maxlength="300"
+                    required /></label
+                ><button>Record draft quote</button>
+              </form>
+              <p class="small">
+                Recording a quote does not send an offer or commit stock. Keep
+                currencies and price bases separate.
+              </p>
+            </section>
+          </div>
+        </section>
+      </section>
+      <dialog id="create-dialog">
+        <form id="create-form">
+          <div class="toolbar">
+            <h2>Record buyer enquiry</h2>
+            <button type="button" id="close-create" class="secondary">
+              Cancel
+            </button>
+          </div>
+          <p>
+            Use genuine buyer information only. Do not enter bank details or
+            identity documents.
+          </p>
+          <div class="pair">
+            <label
+              >Company<input name="company" maxlength="500" required /></label
+            ><label
+              >Company country<input name="company_country" maxlength="120"
+            /></label>
+          </div>
+          <div class="pair">
+            <label
+              >Contact name<input name="name" maxlength="500" required /></label
+            ><label
+              >Business email<input
+                name="email"
+                type="email"
+                maxlength="254"
+                required
+            /></label>
+          </div>
+          <label
+            >Commodity<select name="commodity" id="create-commodity"></select
+          ></label>
+          <div class="pair">
+            <label
+              >Quantity and unit<input
+                name="quantity"
+                maxlength="500"
+                placeholder="For example, 2 metric tonnes"
+                required /></label
+            ><label
+              >Destination<input name="destination" maxlength="500" required
+            /></label>
+          </div>
+          <label
+            >Requirements<textarea
+              name="requirements"
+              maxlength="6000"
+              required
+            ></textarea></label
+          ><label class="check"
+            ><input
+              name="privacy_confirmation"
+              type="checkbox"
+              value="Accepted"
+              required
+            />
+            The buyer initiated this enquiry and has been provided with the
+            privacy notice.</label
+          ><button>Save enquiry</button>
+          <p id="create-error" role="alert"></p>
+        </form>
+      </dialog>
+    </main>
+    <footer>
+      Staurus Foods Limited · Private commercial workspace · All dates shown in
+      your local time
+    </footer>
+  </body>
+</html>
