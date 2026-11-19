@@ -13,7 +13,8 @@ const hash = value => createHash('sha256').update(JSON.stringify(value)).digest(
 
 async function snapshot(client) {
   const tables = (await client.query(`select n.nspname as schema, c.relname as name,
-    c.relrowsecurity, c.relforcerowsecurity, c.relacl::text as acl,
+    c.relrowsecurity, c.relforcerowsecurity,
+    array(select a::text from unnest(coalesce(c.relacl,acldefault('r',c.relowner))) a order by 1) as acl,
     pg_get_userbyid(c.relowner) as owner
     from pg_class c join pg_namespace n on n.oid=c.relnamespace
     where n.nspname=any($1) and c.relkind='r' order by 1,2`, [schemas])).rows;
@@ -24,14 +25,18 @@ async function snapshot(client) {
   }
   const policies = (await client.query(`select schemaname,tablename,policyname,permissive,roles,cmd,qual,with_check
     from pg_policies where schemaname=any($1) order by 1,2,3`, [schemas])).rows;
-  const namespaces = (await client.query(`select nspname,nspacl::text as acl,pg_get_userbyid(nspowner) as owner
+  const namespaces = (await client.query(`select nspname,
+    array(select a::text from unnest(coalesce(nspacl,acldefault('n',nspowner))) a order by 1) as acl,
+    pg_get_userbyid(nspowner) as owner
     from pg_namespace where nspname=any($1) order by 1`,[schemas])).rows;
   const indexes = (await client.query(`select schemaname,tablename,indexname,indexdef from pg_indexes
     where schemaname=any($1) order by 1,2,3`,[schemas])).rows;
   const sequences = (await client.query(`select schemaname,sequencename,sequenceowner,data_type,start_value,min_value,max_value,increment_by,cycle,cache_size,last_value
     from pg_sequences where schemaname=any($1) order by 1,2`,[schemas])).rows;
   const functions = (await client.query(`select n.nspname, p.proname, pg_get_function_identity_arguments(p.oid) as args,
-    pg_get_functiondef(p.oid) as definition, p.proacl::text as acl, pg_get_userbyid(p.proowner) as owner
+    pg_get_functiondef(p.oid) as definition,
+    array(select a::text from unnest(coalesce(p.proacl,acldefault('f',p.proowner))) a order by 1) as acl,
+    pg_get_userbyid(p.proowner) as owner
     from pg_proc p join pg_namespace n on n.oid=p.pronamespace
     where n.nspname=any($1) and p.prokind='f' order by 1,2,3`, [schemas])).rows;
   const constraints = (await client.query(`select n.nspname,c.relname,k.conname,pg_get_constraintdef(k.oid) as definition
