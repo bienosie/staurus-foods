@@ -14,7 +14,8 @@ permissions:
   contents: read
 jobs:
   protected-staging-http:
-    if: github.event_name == 'workflow_dispatch' && inputs.verify_staging && github.ref == 'refs/heads/feature/phase-2-buyer-crm'
+    # This owned commissioning branch may read the fixed staging origin. PR events never receive credentials.
+    if: github.ref == 'refs/heads/feature/phase-2-buyer-crm' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.verify_staging))
     environment: preview
     runs-on: ubuntu-latest
     steps:
