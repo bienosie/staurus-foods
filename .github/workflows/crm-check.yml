@@ -119,6 +119,20 @@ jobs:
       - name: Exercise real database HTTP contracts
         run: node --test tests/http/postgrest.test.mjs
         working-directory: crm
+      - name: Back up and restore the disposable database
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          docker exec "$POSTGRES_CONTAINER" pg_dump --username=postgres --format=custom --dbname=sf_crm_test > "$RUNNER_TEMP/sf-crm-fixture.dump"
+          docker exec "$POSTGRES_CONTAINER" createdb --username=postgres --template=template0 sf_crm_restore
+          docker exec -i "$POSTGRES_CONTAINER" pg_restore --username=postgres --exit-on-error --single-transaction --dbname=sf_crm_restore < "$RUNNER_TEMP/sf-crm-fixture.dump"
+          node crm/tests/http/restore-check.mjs > crm-restore-verification.json
+          cat crm-restore-verification.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crm-disposable-restore-verification
+          path: crm-restore-verification.json
+          retention-days: 30
       - name: Stop disposable API
         if: always()
         run: docker rm -f sf-crm-postgrest || true
